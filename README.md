@@ -4,7 +4,7 @@ custom-launcher
 ![image-2](/images/image-2.png)
 ![image-2](/images/image-3.png)
 
-#Installation
+## Installation
 
 Put on your sd card a file with the name custom-launcher.json with the following structure:
 
@@ -25,4 +25,6 @@ Put on your sd card a file with the name custom-launcher.json with the following
 ```
 
 
-download [/build/custom-launcher.zip] and copy in sdcard/downloads/ on your phone and installl the app with the GerdaOs Installer App.
+1. download [/build/custom-launcher.zip](/build/custom-launcher.zip) 
+2. copy in sdcard/downloads/ on your phone 
+3. installl the app with the GerdaOs Installer App.
