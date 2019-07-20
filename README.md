@@ -6,8 +6,11 @@ custom-launcher
 
 ## Installation
 
-Put on your sd card a file with the name custom-launcher.json with the following structure:
 
+1. download [/build/custom-launcher.zip](/build/custom-launcher.zip) 
+2. copy in sdcard/downloads/ on your phone 
+3. installl the app with the GerdaOs Installer App.
+4. Put on your sd card a file with the name custom-launcher.json with the following structure:
 
 ```
 [
@@ -23,8 +26,4 @@ Put on your sd card a file with the name custom-launcher.json with the following
 ]
 
 ```
-
-
-1. download [/build/custom-launcher.zip](/build/custom-launcher.zip) 
-2. copy in sdcard/downloads/ on your phone 
-3. installl the app with the GerdaOs Installer App.
+5. if you want the weather forecast feature get your own api key from [openweathermap.org](openweathermap.org) and put the api-key in "owm_api_key"
