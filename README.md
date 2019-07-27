@@ -27,3 +27,15 @@ custom-launcher
 
 ```
 5. if you want the weather forecast feature get your own api key from [openweathermap.org](openweathermap.org) and put the api-key in "owm_api_key"
+
+## How to use
+
++ Navigation up/right/down/left
++ Start apps or toggle options enter
++ on the app page press 0 to show all apps
+
+
+
+## To do
+
+Calendar Page: List next coming events

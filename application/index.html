@@ -1,0 +1,100 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+	
+	<title>Custom-Launcher</title>
+	<meta http-equiv="Content-Security-Policy" content="default-src  https://api.openweathermap.org/* 'self'">
+
+
+
+
+	<meta charset="utf-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<link rel="shortcut icon" type="image/x-icon" href="docs/images/favicon.ico" />
+	<link rel="stylesheet" href="assets/css/main.css"/>
+	<link rel="stylesheet" href="assets/css/grid.css"/>
+
+
+
+</head>
+<body>
+<div id="wrapper">
+	<!---------------->
+	<!--app launcher-->
+	<!---------------->
+	<div id="finder" class="flex width-100 height-100 page">
+		<div id="app-list"></div>
+	</div>
+
+	<!----------------------->
+	<!--quick settings------->
+	<!----------------------->
+
+	<div id="quick-settings" class="flex width-100 height-100 page">
+		
+			<div class="items wifi" tabindex="0" data-function="wifi">wifi</div>
+			<div class="items bluetooth" tabindex="1" data-function="bluetooth">bluetooth</div>
+			<div class="items mobile-data" tabindex="2" data-function="mobile_data">mobile data</div>
+			<div class="items airplane" tabindex="3" data-function="airplane">airplane</div>
+		
+	</div>
+
+
+
+	<!---------------->
+	<!--weather------->
+	<!---------------->
+
+	<div id="weather-wrapper"  class="flex width-100 height-100 page">
+		<div id="message" class="width-100">Please wait...</div>
+		<div id="location" class="flex justify-content-center align-item-center width-100">
+			<div>
+				
+				<div id="weather">
+					<section id="forecast-0">
+						<div class="width-100 title flex justify-content-spacearound"><div class="forecast-time"></div></div>
+						<div id="weather-bar" class="flex align-item-center justify-content-spacearound">
+							<div id="icon"><img src=""></div>
+							<div id="temp"></div>
+						</div>
+						<div id="weather-bar" class="flex align-item-center justify-content-spacearound">
+							<div id="wind" class="flex align-item-center">
+								<div id="wind-dir"></div>
+								<div id="wind-speed">
+									<div id="wind-speed-val"></div>
+									<div id="wind-speed-unit">m/sec</div>
+								</div>
+							</div>
+							<div id="pressure">
+								<div id="pressure-val"></div>
+								<div id="pressure-unit">hpa</div>
+							</div>
+						</div>
+					</section>
+				</div>
+			</div>
+		</div>
+
+	</div>
+		
+	<!--
+	///////////////
+	///DEBUG//////
+	//////////////
+	-->
+
+	<div id="debugger"></div>
+
+
+</div>
+
+</body>
+</html>
+
+	<script defer src="assets/js/jQuery-3.1.0.js"></script>
+	<script defer src="assets/js/moments.min.js"></script>
+	<script defer src="assets/js/applait.finder.min.js"></script>
+	<script defer src="assets/js/script.js"></script>
+	<script defer src="assets/js/client.min.js"></script>
+
