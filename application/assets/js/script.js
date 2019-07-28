@@ -26,13 +26,7 @@ $(document).ready(function()
 
 	var pages_arr = [];
 
- var client = new ClientJS();
 
-  client.getDevice();
-  client.getDeviceType();
-  client.getDeviceVendor();
-
-alert( client.getDevice()+"/"+client.getDeviceType()+"/"+client.getDeviceVendor());
 
 	$("div#window-status").text(windowOpen);
 
@@ -137,9 +131,6 @@ alert( client.getDevice()+"/"+client.getDeviceType()+"/"+client.getDeviceVendor(
 		pages_arr.push(value)
 
 	});
-
-						
-				
 
 
 					};
@@ -273,10 +264,10 @@ finder()
 
 
 
-	function listApps()
+	function listApps(param)
 	{
-
-
+		z = -1
+		$("div#app-list").empty();
 		var request = window.navigator.mozApps.mgmt.getAll()
 
 
@@ -295,7 +286,7 @@ finder()
 
 
 
-		if (list_all == true)
+		if (param == true)
 			{
 					finderNav_tabindex++;
 					$("div#app-list").append('<div class="items" tabindex="'+finderNav_tabindex+'" data-url="'+z+'">'+item.manifest.name+'</div>');
@@ -316,7 +307,6 @@ finder()
 
 			});
 
-			//$('div#finder').find('div.items[tabindex=0]').focus();
 			items = document.querySelectorAll('div#app-list > div.items');
 			$('div#finder').find('div.items[tabindex=0]').focus();
 			pos_focus = 0;
@@ -353,7 +343,6 @@ function launchApp()
 
 	request.onsuccess = function() {
 	if (request.result) {
-
 
 	var selected_button = $(":focus")[0];
 	var app_url = selected_button.getAttribute('data-url');
@@ -407,6 +396,11 @@ function quick_settings_toggle()
 
 			case (quick_settings_item == "mobile_data"):
 			data_toggle("set");
+			break;
+
+
+			case (quick_settings_item == "tethering"):
+			tethering_toggle("set");
 			break;
 
 			case (quick_settings_item == "airplane"):
@@ -833,10 +827,139 @@ function airplane_toggle(param)
 
 
 
+
+///////////////////
+///TETHERING///////
+//////////////////
+
+	
+function tethering_toggle(param)
+{
+
+	var lock    = navigator.mozSettings.createLock();
+	var setting = lock.get('tethering.wifi.enabled');
+
+
+
+
+
+
+	setting.onsuccess = function () 
+	{
+
+
+		var callback = JSON.stringify(setting.result);
+
+		
+		if(callback == '{"tethering.wifi.enabled":true}')
+		{
+
+			if(param == "set")
+			{
+				var lock = navigator.mozSettings.createLock();
+				var result = lock.set({
+				'tethering.wifi.enabled': false
+				});
+
+				result.onsuccess = function () 
+				{
+					$("div#quick-settings div.tethering").css("opacity","0.5")
+					$("div#quick-settings div.tethering").css("font-style","italic")
+				}
+
+				result.onerror = function () 
+				{
+					alert("An error occure, the settings remain unchanged");
+				}
+
+			}
+
+			if(param == "get")
+			{
+				$("div#quick-settings div.tethering").css("opacity","1")
+				$("div#quick-settings div.tethering").css("font-style","normal")
+
+
+			}
+
+
+
+		};
+
+		if(callback == '{"tethering.wifi.enabled":false}')
+		{
+
+			if(param == "set")
+			{
+				var lock = navigator.mozSettings.createLock();
+				var setting_tethering = lock.set({
+				'tethering.wifi.enabled': true
+				});
+
+				setting_tethering.onsuccess = function () 
+				{
+
+					$("div#quick-settings div.tethering").css("opacity","1");
+					$("div#quick-settings div.tethering").css("font-style","normal");
+
+					//get PWD
+					var getPWD = lock.get('tethering.wifi.security.password');
+					getPWD.onsuccess = function () 
+					{
+						var stringify_result = JSON.stringify(getPWD.result)
+						var callback = JSON.parse(stringify_result)
+
+						$("div#message-box").text(callback['tethering.wifi.security.password'])
+						$("div#message-box").css("display","block")
+
+
+						setTimeout(function() {
+							$("div#message-box").text("");
+							$("div#message-box").css("display","none");
+						}, 10000);
+
+					}
+
+				}
+
+				setting_tethering.onerror = function () 
+				{
+					alert("An error occure, the settings remain unchanged");
+				}
+
+			}
+
+			if(param == "get")
+			{
+				$("div#quick-settings div.tethering").css("opacity","0.5")
+				$("div#quick-settings div.tethering").css("font-style","italic")
+
+			}
+		};
+
+	}
+
+
+	setting.onerror = function () 
+	{
+		console.warn('An error occured: ' + setting.error);
+	}
+
+
+}
+
+
+
+
+
+
+
+
 //get status on start
 wifi_toggle("get");
 bluetooth_toggle("get");
 data_toggle("get");
+tethering_toggle("get");
 
 
 
@@ -1052,6 +1175,11 @@ $("div#weather-wrapper div#message").css('display','none')
 			case '9':
 			focus_shortcut(8)
 			break; 
+
+			case '0':
+			listApps(true);
+			break; 
+
 
 		}
 

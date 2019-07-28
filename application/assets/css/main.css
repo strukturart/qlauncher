@@ -58,7 +58,7 @@ div#window-status
 	left:5px;
 	background:black;
 	color:white;
-	z-index: 1000;
+	z-index: 900;
 	display:none;
 
 }
@@ -242,16 +242,18 @@ div#location div#weather div#wind-speed div#wind-speed-unit
 
 
 
-div#debugger
+div#message-box
 {
 	display:none;
 	position:fixed;
-	top:10px;
-	left:10px;
-	width:80%;
+	bottom:5px;
+	left:0px;
+	padding:5px;
+	min-width:100vw;
 	height:auto;
 	background:pink;
 	color:black;
+	z-index:2000;
 }
 
 
