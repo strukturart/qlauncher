@@ -26,13 +26,13 @@
      pagecolor="#000000"
      bordercolor="#666666"
      borderopacity="1.0"
-     inkscape:pageopacity="1"
+     inkscape:pageopacity="0"
      inkscape:pageshadow="2"
-     inkscape:zoom="4.788096"
-     inkscape:cx="2.5517854"
-     inkscape:cy="48.490408"
+     inkscape:zoom="0.598512"
+     inkscape:cx="8.0863444"
+     inkscape:cy="40.136357"
      inkscape:document-units="mm"
-     inkscape:current-layer="g826"
+     inkscape:current-layer="g822"
      showgrid="false"
      units="px"
      showguides="false"
@@ -41,7 +41,8 @@
      inkscape:window-x="0"
      inkscape:window-y="27"
      inkscape:window-maximized="1"
-     inkscape:lockguides="true" />
+     inkscape:lockguides="true"
+     inkscape:pagecheckerboard="true" />
   <metadata
      id="metadata5">
     <rdf:RDF>

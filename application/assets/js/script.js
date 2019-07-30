@@ -45,6 +45,31 @@ $(document).ready(function()
 
 
 
+if (window.indexedDB) {
+
+	var DBOpenRequest = window.indexedDB.open("b2g-calendar");
+	DBOpenRequest.onerror = function(event) {
+	console.log("error: " + event.target.errorCode);
+};
+
+DBOpenRequest.onsuccess = function(event) {
+
+	var db = event.target.result;
+	var data_string = JSON.stringify(db)
+	alert(data_string )
+}
+
+
+	}
+	else {
+	 alert("Indexed DB is not supported");
+	}
+
+
+
+
+
+
 
 
 	/////////////////////////
@@ -1105,6 +1130,52 @@ $("div#weather-wrapper div#message").css('display','none')
  }
 
 
+
+
+////TO DO calendar list page
+
+
+
+
+/*
+DBOpenRequest.onsuccess = function(event) {
+
+	//$("div#debugger").append(DBOpenRequest.objectStoreNames);
+
+
+  db = DBOpenRequest.result;   
+
+    //$("div#debugger").append("<li>"+[db]+"</li>");
+
+  var transaction = db.transaction(["b2g-calendar"], "readonly");
+    
+   //$("div#debugger").append([transaction]);
+    
+  var objectStore = transaction.objectStore('Calendar');
+    
+    //$("div#debugger").append([objectStore]);
+
+  objectStore.openCursor().onsuccess = function(event) {
+    var cursor = event.target.result;
+      //$("div#debugger").append([cursor]);
+      
+    if(cursor) {
+     //$("div#debugger").append(cursor.value)
+      
+      //$("div#debugger").append(cursor.primaryKey);
+      cursor.continue();
+    } else {
+      //$("div#debugger").append('Entries all displayed.');
+    }
+  };
+
+};
+
+
+
+
+*/
+
 	//////////////////////////
 	////KEYPAD TRIGGER////////////
 	/////////////////////////
@@ -1218,78 +1289,5 @@ if(debug == true)
 
 
 
-
-////TO DO calendar list page
-
-
-
-/*
-if (window.indexedDB) {
-	  //alert("IndexedDB support is there");
-	}
-	else {
-	   alert("Indexed DB is not supported. Where are you trying to run this ? ");
-	}
-
-
-var db;
-// Let us open our database
-var DBOpenRequest = window.indexedDB.open("b2g-calendar");
-$("div#debugger").append("<h1>output</h1>");
-//$("div#debugger").append([DBOpenRequest]);
-
-DBOpenRequest.onerror = function(event) {
-  // Allgemeine Fehlerbehandlung, die für alle Anfragen an die Datenbank gilt. 
-  alert("error")
-  $("div#debugger").append("Datenbankfehler: " + event.target.errorCode);
-};
-
-DBOpenRequest.onsuccess = function(event) {
-	 //$("div#debugger").append(event.target);
-	   db = DBOpenRequest.result;
-
-	    $("div#debugger").append(db.version);
-
-$("div#debugger").append(db.objectStoreNames[0]);
-
-	}
-
-
-
-DBOpenRequest.onsuccess = function(event) {
-
-	//$("div#debugger").append(DBOpenRequest.objectStoreNames);
-
-
-  db = DBOpenRequest.result;   
-
-    //$("div#debugger").append("<li>"+[db]+"</li>");
-
-  var transaction = db.transaction(["b2g-calendar"], "readonly");
-    
-   //$("div#debugger").append([transaction]);
-    
-  var objectStore = transaction.objectStore('Calendar');
-    
-    //$("div#debugger").append([objectStore]);
-
-  objectStore.openCursor().onsuccess = function(event) {
-    var cursor = event.target.result;
-      //$("div#debugger").append([cursor]);
-      
-    if(cursor) {
-     //$("div#debugger").append(cursor.value)
-      
-      //$("div#debugger").append(cursor.primaryKey);
-      cursor.continue();
-    } else {
-      //$("div#debugger").append('Entries all displayed.');
-    }
-  };
-
-};
-
-
-*/
 
 
