@@ -45,28 +45,6 @@ $(document).ready(function()
 
 
 
-if (window.indexedDB) {
-
-	var DBOpenRequest = window.indexedDB.open("b2g-calendar");
-	DBOpenRequest.onerror = function(event) {
-	console.log("error: " + event.target.errorCode);
-};
-
-DBOpenRequest.onsuccess = function(event) {
-
-	var db = event.target.result;
-	var data_string = JSON.stringify(db)
-	alert(data_string )
-}
-
-
-	}
-	else {
-	 alert("Indexed DB is not supported");
-	}
-
-
-
 
 
 
@@ -149,13 +127,13 @@ DBOpenRequest.onsuccess = function(event) {
 									listApps()
 
 
-//get list of pages								
-	$('.page').each(function() {
-		var currentElement = $(this);
-		var value = currentElement.attr('id'); 
-		pages_arr.push(value)
+					//get list of pages								
+						$('.page').each(function() {
+							var currentElement = $(this);
+							var value = currentElement.attr('id'); 
+							pages_arr.push(value)
 
-	});
+						});
 
 
 					};
@@ -179,27 +157,44 @@ finder()
 
 
 	function nav (move) {
-			console.log(pages_arr.length)
+
 		
-		if(move == "+1" &&  pos_focus < finderNav_tabindex)
+		if(move == "+1")
 		{
 			pos_focus++
 
-			if( pos_focus <= finderNav_tabindex)
+			if(pos_focus <= items.length)
 			{
-				var targetElement = items[pos_focus];
-				targetElement.focus();
 
+				$('div[tabindex='+pos_focus+']').focus()
+			}	
+
+			if( pos_focus == items.length)
+			{
+				pos_focus = 0;
+				$('div[tabindex=0]').focus()
+
+				  
 			}
+
+
 		}
 
-		if(move == "-1" &&   pos_focus > 0)
+		if(move == "-1")
 		{
 			pos_focus--
 			if( pos_focus >= 0)
 			{
-				var targetElement = items[ pos_focus];
-				targetElement.focus();
+				
+				$('div[tabindex='+pos_focus+']').focus()
+
+			}
+
+			if(pos_focus == -1)
+			{
+				pos_focus = items.length-1;
+				
+				$('div[tabindex='+pos_focus+']').focus()
 
 			}
 		}
@@ -207,7 +202,7 @@ finder()
 
 		if(move == "slide_right")
 		{
-
+			pos_focus = 0;
 			if(page < pages_arr.length-1)
 			{
 				page++
@@ -228,14 +223,14 @@ finder()
 				{
 					items = document.querySelectorAll('div#quick-settings > div.items');
 					$('div#quick-settings').find('div.items[tabindex=0]').focus();
-					pos_focus = 0;
+					
 				}
 
 				if(pages_arr[page] == "finder")
 				{
+					alert(items.length-1);
 					items = document.querySelectorAll('div#app-list > div.items');
 					$('div#app-list').find('div.items[tabindex=0]').focus();
-					pos_focus = 0;
 
 				}
 
@@ -246,6 +241,7 @@ finder()
 
 		if(move == "slide_left")
 		{
+			pos_focus = 0;
 			if(page > 0)
 			{
 				page--
@@ -257,7 +253,6 @@ finder()
 				{
 					items = document.querySelectorAll('div#quick-settings > div.items');
 					$('div#quick-settings').find('div.items[tabindex=0]').focus();
-					pos_focus = 0;
 				}
 
 
@@ -265,7 +260,6 @@ finder()
 				{
 					items = document.querySelectorAll('div#app-list > div.items');
 					$('div#app-list').find('div.items[tabindex=0]').focus();
-					pos_focus = 0;
 				}
 
 			
@@ -317,17 +311,17 @@ finder()
 					$("div#app-list").append('<div class="items" tabindex="'+finderNav_tabindex+'" data-url="'+z+'">'+item.manifest.name+'</div>');
 			}
 
-			else
+		else
+		{
+
+			var valid = jQuery.inArray(item.manifest.name, app_list_filter_arr)
+			if(valid != -1)
 			{
-
-				var valid = jQuery.inArray(item.manifest.name, app_list_filter_arr)
-				if(valid != -1)
-				{
-					finderNav_tabindex++;
-					$("div#app-list").append('<div class="items" tabindex="'+finderNav_tabindex+'" data-url="'+z+'">'+item.manifest.name+'</div>');
-				}
-
+				finderNav_tabindex++;
+				$("div#app-list").append('<div class="items" tabindex="'+finderNav_tabindex+'" data-url="'+z+'">'+item.manifest.name+'</div>');
 			}
+
+		}
 
 
 			});
@@ -1130,51 +1124,34 @@ $("div#weather-wrapper div#message").css('display','none')
  }
 
 
+function read_calendar()
+{
+
+	if (window.indexedDB) 
+	{
+		var db;
+		var request = window.indexedDB.open('calendar', 15);
+
+		request.onerror = function (event) 
+		{
+			alert("openDb:", event.target.errorCode);
+		};
+
+		request.onsuccess = function(event) 
+		{
+		db = this.result;
+		var transaction = db.transaction(["calendar"], "readwrite");
+
+		};
 
 
-////TO DO calendar list page
+	
 
+		
+	}
 
+}
 
-
-/*
-DBOpenRequest.onsuccess = function(event) {
-
-	//$("div#debugger").append(DBOpenRequest.objectStoreNames);
-
-
-  db = DBOpenRequest.result;   
-
-    //$("div#debugger").append("<li>"+[db]+"</li>");
-
-  var transaction = db.transaction(["b2g-calendar"], "readonly");
-    
-   //$("div#debugger").append([transaction]);
-    
-  var objectStore = transaction.objectStore('Calendar');
-    
-    //$("div#debugger").append([objectStore]);
-
-  objectStore.openCursor().onsuccess = function(event) {
-    var cursor = event.target.result;
-      //$("div#debugger").append([cursor]);
-      
-    if(cursor) {
-     //$("div#debugger").append(cursor.value)
-      
-      //$("div#debugger").append(cursor.primaryKey);
-      cursor.continue();
-    } else {
-      //$("div#debugger").append('Entries all displayed.');
-    }
-  };
-
-};
-
-
-
-
-*/
 
 	//////////////////////////
 	////KEYPAD TRIGGER////////////
@@ -1248,7 +1225,8 @@ DBOpenRequest.onsuccess = function(event) {
 			break; 
 
 			case '0':
-			listApps(true);
+			//listApps(true);
+			read_calendar()
 			break; 
 
 
