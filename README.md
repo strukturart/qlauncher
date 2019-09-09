@@ -26,7 +26,7 @@ custom-launcher
 	{
 		"weather":
 		{
-			"owm_api_key":"6d385ac2ee574b079ea964532d681348",
+			"owm_api_key":"6d385ac2ee964532d681348",
 		
 			"location":
 			{
@@ -62,3 +62,11 @@ custom-launcher
 ## To do
 
 Calendar Page: List next coming events
+
+## Donation
+
+You like the app and you have enough money
+
+[![](https://www.paypalobjects.com/en_US/i/btn/btn_donateCC_LG.gif)](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=Q8QLA8CNMWAWG)
+
+
