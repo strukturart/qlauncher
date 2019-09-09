@@ -14,6 +14,7 @@ $(document).ready(function()
 	var debug = false;
 	var page = 0;
 	var pos_focus = 0
+	var locations = [];
 
 
 	var current_lng;
@@ -28,6 +29,7 @@ $(document).ready(function()
 
 
 
+
 	$("div#window-status").text(windowOpen);
 
 
@@ -37,7 +39,7 @@ $(document).ready(function()
 	    return function() {
 	        if (!executed) {
 	            executed = true;
-	            weather()
+	            weather("geolocation")
 	        }
 	    };
 	})();
@@ -107,7 +109,7 @@ $(document).ready(function()
 									$.each(app_list_filter, function(i, item) {
 									app_list_filter_arr[i] = item.app_name;
 
-									openweather_api = item.owm_api_key 
+									//openweather_api = item.owm_api_key 
 
 
 									
@@ -116,11 +118,28 @@ $(document).ready(function()
 											list_all = true;
 										}
 
+										if(item.weather)
+										{
+											openweather_api = item.weather.owm_api_key;
 
-										if(openweather_api == "")
+												if(openweather_api == "")
 										{
 											$("div#weather-wrapper").remove()
 										}
+
+										else
+										{
+											//weather("geolocation")
+
+										}
+
+											$.each(item.weather.location, function(k, item_location) {
+												locations.push([k,item_location.position_lat,item_location.position_long])
+											})
+										}
+
+
+									
 								
 									});
 
@@ -162,6 +181,8 @@ finder()
 		if(move == "+1")
 		{
 			pos_focus++
+
+
 
 			if(pos_focus <= items.length)
 			{
@@ -216,6 +237,7 @@ finder()
 				{
 					//execute weather() only once
 					once_exec()
+					//weather()
 				}
 				
 
@@ -228,9 +250,14 @@ finder()
 
 				if(pages_arr[page] == "finder")
 				{
-					alert(items.length-1);
 					items = document.querySelectorAll('div#app-list > div.items');
 					$('div#app-list').find('div.items[tabindex=0]').focus();
+
+				}
+
+				if(pages_arr[page] == "weather-wrapper")
+				{
+					items = document.querySelectorAll('div#weather-wrapper div#weather-locations > div.items');
 
 				}
 
@@ -261,6 +288,14 @@ finder()
 					items = document.querySelectorAll('div#app-list > div.items');
 					$('div#app-list').find('div.items[tabindex=0]').focus();
 				}
+
+				if(pages_arr[page] == "weather-wrapper")
+				{
+					items = document.querySelectorAll('div#weather-wrapper div#weather-locations > div.items');
+					//weather()
+
+				}
+
 
 			
 			}
@@ -989,40 +1024,99 @@ tethering_toggle("get");
 ////GEOLOCATION/////
 ///////////////////
 
-
-function weather()
+function select_location()
 {
 
-var options = {
-  enableHighAccuracy: true,
-  timeout: 30000,
-  maximumAge: 0
-};
+	k = -1;
+	$("div#weather-wrapper div#locations").empty();
 
-function success(pos) {
-  var crd = pos.coords;
-
-
-
-	current_lng = crd.longitude;
-	current_lat = crd.latitude;
-	fetch_weather_data()
-
+for(var i = 0; i < locations.length; i++)
+{
+k++;
+	$("div#weather-wrapper div#locations").append("<div class='items' tabindex="+k+" data-lat="+locations[i][1]+" data-long="+locations[i][2]+">"+locations[i][0]+"</div>")
 }
 
-function error(err) {
- alert(err.code+":"+err.message);
+	if(pages_arr[page] == "weather-wrapper")
+	{
+	
+
+
+		$("div#weather-wrapper div#locations").css("display","block")
+		$("div#weather-wrapper div#location").css("display","none")
+		$("div#weather-wrapper div#locations div").first().focus();
+		items = document.querySelectorAll('div#weather-wrapper div#locations > div.items');
+
+
+
+
+
+
+	}
 }
 
-navigator.geolocation.getCurrentPosition(success, error, options);
+function choice_location()
+{
 
+	if(pages_arr[page] == "weather-wrapper")
+	{
+
+		
+		var selected_button = $(":focus")[0];
+		current_lng = selected_button.getAttribute('data-long');
+		current_lat = selected_button.getAttribute('data-lat');
+
+
+		$("div#weather-wrapper div#locations").css("display","none")
+		$("div#weather-wrapper div#location").css("display","block")
+		weather("notgelocation")
+
+	}
+}
+
+
+
+
+function weather(param)
+{
+
+
+
+if(param == "geolocation")
+{
+	var options = {
+	enableHighAccuracy: true,
+	timeout: 30000,
+	maximumAge: 0
+	};
+
+	function success(pos) {
+	var crd = pos.coords;
+
+
+
+		current_lng = crd.longitude;
+		current_lat = crd.latitude;
+		fetch_weather_data()
+
+	}
+
+	function error(err) {
+	 alert(err.code+":"+err.message);
+	}
+
+	navigator.geolocation.getCurrentPosition(success, error, options);
+}
+
+else
+{
+			fetch_weather_data()
+
+}
 
 function fetch_weather_data()
 {
 
 var request_url = "https://api.openweathermap.org/data/2.5/forecast?lat="+current_lat+"&lon="+current_lng+"&units=metric&APPID="+openweather_api;
-// Assign handlers immediately after making the request,
-// and remember the jqxhr object for this request
 var jqxhr = $.getJSON(request_url, function(data) {
   //alert( "success" );
 
@@ -1068,6 +1162,10 @@ var jqxhr = $.getJSON(request_url, function(data) {
 
 
 	//cloning elements
+	$('div#weather section').not(':first').remove();
+	//$('div#weather section#forecast-0 > div').text('')
+	//$('div#weather section#forecast-0 > img').attr('src',"")
+
 	var template = $("section#forecast-0")
 	var k = -1;
 	for (var i = 0; i < 20; i++) 
@@ -1168,6 +1266,7 @@ function read_calendar()
 	        case 'Enter':
 	        launchApp();
 	        quick_settings_toggle();
+	        choice_location();
 	        break;
 
 
@@ -1185,8 +1284,15 @@ function read_calendar()
 			break; 
 
 			case 'ArrowLeft':
-				nav("slide_left")
+				nav("slide_left");
+
 			break; 
+
+			case 'SoftLeft':
+				select_location();
+			break; 
+
+			
 
 			case '1':
 			focus_shortcut(0)
@@ -1225,8 +1331,8 @@ function read_calendar()
 			break; 
 
 			case '0':
-			//listApps(true);
-			read_calendar()
+			listApps(true);
+			//read_calendar()
 			break; 
 
 

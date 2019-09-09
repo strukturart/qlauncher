@@ -22,7 +22,30 @@ custom-launcher
 	{"app_name":"Note"},
 	{"app_name":"shellCMD"},
 	{"app_name":"Calendar"},
-	{"owm_api_key":"1234567"}
+	{"app_name":"rss-reader"},
+	{
+		"weather":
+		{
+			"owm_api_key":"6d385ac2ee574b079ea964532d681348",
+		
+			"location":
+			{
+				"singapore":
+				{
+					"position_lat":"1.290270",
+					"position_long":"103.851959"
+
+				},
+				"prag":
+				{
+					"position_lat":"50.073658",
+					"position_long":"14.418540"
+
+				}
+			}
+
+		}
+	}
 ]
 
 ```

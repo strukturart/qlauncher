@@ -147,6 +147,19 @@ div#quick-settings div:focus
 }
 
 
+div#calendar-event-list
+{
+	display:none;
+	position:relative;
+	background:black;
+	padding:5px;
+	color:white;
+	height:100vh;
+	width:100vw;
+	
+}
+
+
 /*///////////////////////////
 ///LOCATION////////////////*/
 
@@ -163,6 +176,32 @@ div#location
   padding:5px 10px 50px 5px;
   overflow: hidden;
   display:none;
+}
+
+div#weather-wrapper div#locations
+{
+	display:none;
+	position:fixed;
+	z-index:1001;
+	background:black;
+	top:0px;
+	left:0px;
+}
+
+div#weather-wrapper div#locations div
+{
+	display:block;
+	background:black;
+	color:white;
+	width:100%;
+	height:auto;
+	margin:0 0 5px 0;
+}
+
+div#weather-wrapper div#locations div:focus
+{
+	background:yellow;
+	color:black;
 }
 
 
