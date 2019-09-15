@@ -11,7 +11,7 @@ $(document).ready(function()
 	var app_list_filter_arr = [];
 	var app_shortcut_arr = [];
 	var list_all = false;
-	var debug = false;
+	var debug = true;
 	var page = 0;
 	var pos_focus = 0
 	var locations = [];
@@ -45,7 +45,36 @@ $(document).ready(function()
 	})();
 
 
+function notify(param_text) {
 
+	  var options = {
+      body: param_text
+  }
+  // Let's check if the browser supports notifications
+  if (!("Notification" in window)) {
+    alert("This browser does not support desktop notification");
+  }
+
+  // Let's check whether notification permissions have already been granted
+  else if (Notification.permission === "granted") {
+    // If it's okay let's create a notification
+     var notification = new Notification("App uninstall",options);
+
+  }
+
+  // Otherwise, we need to ask the user for permission
+  else if (Notification.permission !== "denied") {
+    Notification.requestPermission().then(function (permission) {
+      // If the user accepts, let's create a notification
+      if (permission === "granted") {
+        var notification = new Notification("App uninstall",options);
+
+
+      }
+    });
+  }
+
+}
 
 
 
@@ -55,7 +84,7 @@ $(document).ready(function()
 	/////////////////////////
 	function finder()
 	{
-
+	app_list_filter_arr.length = 0;
 
 	var finder = new Applait.Finder({ type: "sdcard", debugMode: true });
 
@@ -122,16 +151,12 @@ $(document).ready(function()
 										{
 											openweather_api = item.weather.owm_api_key;
 
-												if(openweather_api == "")
+										if(openweather_api == "")
 										{
 											$("div#weather-wrapper").remove()
 										}
 
-										else
-										{
-											//weather("geolocation")
-
-										}
+									
 
 											$.each(item.weather.location, function(k, item_location) {
 												locations.push([k,item_location.position_lat,item_location.position_long])
@@ -146,6 +171,7 @@ $(document).ready(function()
 									listApps()
 
 
+
 					//get list of pages								
 						$('.page').each(function() {
 							var currentElement = $(this);
@@ -158,7 +184,7 @@ $(document).ready(function()
 					};
 					reader.readAsText(file)
 				});
-
+									$('div#finder').find('div.items[tabindex=0]').focus();
 
 	}	
 
@@ -292,7 +318,6 @@ finder()
 				if(pages_arr[page] == "weather-wrapper")
 				{
 					items = document.querySelectorAll('div#weather-wrapper div#weather-locations > div.items');
-					//weather()
 
 				}
 
@@ -322,6 +347,7 @@ finder()
 	{
 		z = -1
 		$("div#app-list").empty();
+		finderNav_tabindex = -1;
 		var request = window.navigator.mozApps.mgmt.getAll()
 
 
@@ -353,7 +379,7 @@ finder()
 			if(valid != -1)
 			{
 				finderNav_tabindex++;
-				$("div#app-list").append('<div class="items" tabindex="'+finderNav_tabindex+'" data-url="'+z+'">'+item.manifest.name+'</div>');
+				$("div#app-list").append('<div class="items" tabindex="'+finderNav_tabindex+'" data-app_name = "'+item.manifest.name+'"data-url="'+z+'">'+item.manifest.name+'</div>');
 			}
 
 		}
@@ -407,8 +433,43 @@ function launchApp()
   } 
 };
 
+}
 
 
+function delete_app()
+{
+
+
+	var request = window.navigator.mozApps.mgmt.getAll()
+	request.onsuccess = function() {
+	if (request.result) {
+
+
+		var selected_button = $(":focus")[0];
+		var app_url = selected_button.getAttribute('data-url');
+		var app_name = selected_button.getAttribute('data-app_name');
+		var delete_request= navigator.mozApps.mgmt.uninstall(request.result[app_url])
+
+
+		delete_request.error = function(event)
+		{
+			alert("error: app not unistalled")
+		};
+
+		delete_request.onsuccess = function(event)
+		{
+			var text = app_name+" successfully uninstalled";
+			notify(text)
+			finder();
+			setTimeout(function(){
+				items = document.querySelectorAll('div#app-list > div.items');
+				$('div#app-list').find('div.items[tabindex=0]').focus();
+			},3000); 			
+		};
+
+		}
+	}
+	
 
 }
 
@@ -1026,30 +1087,25 @@ tethering_toggle("get");
 
 function select_location()
 {
+	pos_focus = 0
+	$('div#weather-wrapper div#locations').find('div.items[tabindex=0]').focus();
 
 	k = -1;
 	$("div#weather-wrapper div#locations").empty();
 
-for(var i = 0; i < locations.length; i++)
-{
-k++;
-	$("div#weather-wrapper div#locations").append("<div class='items' tabindex="+k+" data-lat="+locations[i][1]+" data-long="+locations[i][2]+">"+locations[i][0]+"</div>")
-}
+	for(var i = 0; i < locations.length; i++)
+	{
+		k++;
+		$("div#weather-wrapper div#locations").append("<div class='items' tabindex="+k+" data-lat="+locations[i][1]+" data-long="+locations[i][2]+">"+locations[i][0]+"</div>")
+	}
 
 	if(pages_arr[page] == "weather-wrapper")
 	{
 	
-
-
 		$("div#weather-wrapper div#locations").css("display","block")
 		$("div#weather-wrapper div#location").css("display","none")
 		$("div#weather-wrapper div#locations div").first().focus();
 		items = document.querySelectorAll('div#weather-wrapper div#locations > div.items');
-
-
-
-
-
 
 	}
 }
@@ -1068,7 +1124,7 @@ function choice_location()
 
 		$("div#weather-wrapper div#locations").css("display","none")
 		$("div#weather-wrapper div#location").css("display","block")
-		weather("notgelocation")
+		weather("notgeolocation")
 
 	}
 }
@@ -1109,7 +1165,7 @@ if(param == "geolocation")
 
 else
 {
-			fetch_weather_data()
+	fetch_weather_data()
 
 }
 
@@ -1163,8 +1219,7 @@ var jqxhr = $.getJSON(request_url, function(data) {
 
 	//cloning elements
 	$('div#weather section').not(':first').remove();
-	//$('div#weather section#forecast-0 > div').text('')
-	//$('div#weather section#forecast-0 > img').attr('src',"")
+
 
 	var template = $("section#forecast-0")
 	var k = -1;
@@ -1228,7 +1283,7 @@ function read_calendar()
 	if (window.indexedDB) 
 	{
 		var db;
-		var request = window.indexedDB.open('calendar', 15);
+		var request = window.indexedDB.open('b2g-calendar', 1);
 
 		request.onerror = function (event) 
 		{
@@ -1251,23 +1306,64 @@ function read_calendar()
 }
 
 
+var key_time
+var press_time = 0;
+var longpress = false;
+function func_interval()
+{
+	longpress = false;
+	press_time = 0;
+	key_time = setInterval(function() { 
+				press_time++
+
+				if(press_time > 2)
+				{
+				longpress = true;
+				delete_app();
+				return;
+				}
+			
+	}, 1000);
+				
+	
+}
+
+
 	//////////////////////////
 	////KEYPAD TRIGGER////////////
 	/////////////////////////
+function handleKeyUp(evt) 
+
+{	
+		clearInterval(key_time)
+
+	switch (evt.key) 
+	{
+		case 'Enter':
+		
+
+if(longpress == false)
+{
+		
+					
+
+			launchApp();
+			quick_settings_toggle();
+			choice_location();
+		}
+
+		break;
+
+	}
+}
 
 
 
 	function handleKeyDown(evt) {
-
-
+			func_interval();
 			switch (evt.key) {
 
-
-	        case 'Enter':
-	        launchApp();
-	        quick_settings_toggle();
-	        choice_location();
-	        break;
+		
 
 
 			case 'ArrowDown':
@@ -1300,6 +1396,8 @@ function read_calendar()
 
 			case '2':
 			focus_shortcut(1)
+			break; 
+
 			break; 
 
 			case '3':
@@ -1343,6 +1441,7 @@ function read_calendar()
 
 
 	document.addEventListener('keydown', handleKeyDown);
+	document.addEventListener('keyup', handleKeyUp);
 
 
 	//////////////////////////
@@ -1369,9 +1468,4 @@ if(debug == true)
 
 
 });
-
-
-
-
-
 
