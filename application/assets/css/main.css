@@ -106,6 +106,23 @@ div#finder div#app-list
 	overflow:hidden;
 }
 
+div#finder div#app-list .element-of-dir
+{
+	display:none;
+}
+
+div#finder div#app-list .dir
+{
+	border-left:4px solid blue;
+	padding:0 0 0 3px;
+}
+
+div#finder div#app-list .dir span.app-name
+{
+	display:none;
+}
+
+
 div#finder div#app-list div
 {
 	min-width:100%;

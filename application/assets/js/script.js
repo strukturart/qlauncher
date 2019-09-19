@@ -15,6 +15,8 @@ $(document).ready(function()
 	var page = 0;
 	var pos_focus = 0
 	var locations = [];
+	var dir_level = 0;
+
 
 
 	var current_lng;
@@ -136,17 +138,19 @@ function notify(param_text) {
 									
 
 									$.each(app_list_filter, function(i, item) {
-									app_list_filter_arr[i] = item.app_name;
+										if(item.dir == undefined)
+										{
+											app_list_filter_arr.push([item.app_name,"root"]);
+										}
+										else
+										{
+											app_list_filter_arr.push([item.app_name,item.dir]);
 
-									//openweather_api = item.owm_api_key 
-
+										}
+									
 
 									
-										if(app_list_filter_arr[i] == "list all")
-										{
-											list_all = true;
-										}
-
+									
 										if(item.weather)
 										{
 											openweather_api = item.weather.owm_api_key;
@@ -162,9 +166,6 @@ function notify(param_text) {
 												locations.push([k,item_location.position_lat,item_location.position_long])
 											})
 										}
-
-
-									
 								
 									});
 
@@ -341,7 +342,7 @@ finder()
 
 
 
-
+	var dir_first_child;
 
 	function listApps(param)
 	{
@@ -374,22 +375,47 @@ finder()
 
 		else
 		{
-
-			var valid = jQuery.inArray(item.manifest.name, app_list_filter_arr)
-			if(valid != -1)
+			for(var i = 0; i< app_list_filter_arr.length-1; i++)
 			{
-				finderNav_tabindex++;
-				$("div#app-list").append('<div class="items" tabindex="'+finderNav_tabindex+'" data-app_name = "'+item.manifest.name+'"data-url="'+z+'">'+item.manifest.name+'</div>');
+
+			//var valid = jQuery.inArray(item.manifest.name, app_list_filter_arr[i][0])
+			//alert(valid)
+			if(item.manifest.name == app_list_filter_arr[i][0])
+			{
+								finderNav_tabindex++;
+
+			if(app_list_filter_arr[i][1] == "root")
+			{
+							
+				$("div#app-list").append('<div class="items" tabindex="0" data-app_name = "'+item.manifest.name+'"data-url="'+z+'">'+item.manifest.name+'</div>');
 			}
+							
+			if(app_list_filter_arr[i][1] != "root")
+			{
+							
+				if(dir_first_child == app_list_filter_arr[i][1])
+				{
+					$("div#app-list").append('<div class="items dir" tabindex="0" data-app_name = "'+item.manifest.name+'"data-url="'+z+'"><span class="dir-name">'+app_list_filter_arr[i][1]+'</span><span class="app-name">'+item.manifest.name+'</span></div>');
+				}
+				else
+				{
+					$("div#app-list").append('<div class="items dir element-of-dir" tabindex="0" data-app_name = "'+item.manifest.name+'"data-url="'+z+'"><span class="dir-name">'+app_list_filter_arr[i][1]+'</span><span class="app-name">'+item.manifest.name+'</span></div>');
+				}
+				dir_first_child = app_list_filter_arr[i][1]
+			}
+				
+
+			}
+		}
 
 		}
 
 
 			});
 
-			items = document.querySelectorAll('div#app-list > div.items');
-			$('div#finder').find('div.items[tabindex=0]').focus();
+			items = $('div#app-list > div.items:visible');
 			pos_focus = 0;
+			set_tabindex()
 
 
 			} 
@@ -402,12 +428,49 @@ finder()
 		// Display error name from the DOMError object
 		alert("Error: " + request.error.name);
 		};
+		
 
 	}
 
 
 
 
+
+
+
+function set_tabindex()
+{
+		var items_list = $('div#finder div.items:visible');
+		items = $('div#app-list > div.items:visible');
+		
+		for(var i =-1; i < items.length; i++)
+		{
+			$(items[i]).attr('tabindex',i) 
+			pos_focus = 0
+			$('div#finder').find('div.items[tabindex=0]').focus();
+
+		}
+}
+
+
+function dir_nav()
+{
+	if(dir_level == 1)
+	{
+			$("div.items").css("display","block");
+			$("div.items").children('.dir-name').css('display','block')
+			$("div.items").children('.app-name').css('display','none')
+			$("div.element-of-dir").css("display","none");
+			set_tabindex()
+			pos_focus = 0
+			$('div#finder').find('div.items[tabindex=0]').focus();
+			dir_level = 0;
+
+
+	}
+
+
+}
 
 //////////////////
 //LAUNCH APP
@@ -418,55 +481,88 @@ function launchApp()
 	if(page == 0)
 	{
 
-	var request = window.navigator.mozApps.mgmt.getAll()
+		var selected_button = $(":focus")[0];
+		var app_url = selected_button.getAttribute('data-url');
+		if($(selected_button).hasClass('dir') && dir_level == 0)
+		{
+			$("div.items").css("display","none");
+
+			var same_class = $("*:focus").eq(0).attr('class')
+		
+			
+			var elems = document.getElementsByClassName(same_class);
+			$(elems).children('.dir-name').css('display','none')
+			$(elems).children('.app-name').css('display','block')
+			$(elems).css("display","block");
+			set_tabindex()
+			pos_focus = 0
+			$('div#finder').find('div.items[tabindex=0]').focus();
+			dir_level = 1;
+			return;
 
 
-	request.onsuccess = function() {
-	if (request.result) {
+		
 
-	var selected_button = $(":focus")[0];
-	var app_url = selected_button.getAttribute('data-url');
-	request.result[app_url].launch()
+			
+		}
+		else
+		{
+			var request = window.navigator.mozApps.mgmt.getAll();
+			request.onsuccess = function() 
+			{
+				if (request.result) 
+				{
+					request.result[app_url].launch()
+					return;
+				}
+				
+			}
+		} 
+
+
+	
+
 	}
-
-
-  } 
-};
-
 }
 
 
+//////////////////
+//DELETE APP
+//////////////////
+
 function delete_app()
 {
+	if(page == 0)
+	{
+
+		var request = window.navigator.mozApps.mgmt.getAll()
+		request.onsuccess = function() {
+		if (request.result) {
 
 
-	var request = window.navigator.mozApps.mgmt.getAll()
-	request.onsuccess = function() {
-	if (request.result) {
+			var selected_button = $(":focus")[0];
+			var app_url = selected_button.getAttribute('data-url');
+			var app_name = selected_button.getAttribute('data-app_name');
+			var delete_request= navigator.mozApps.mgmt.uninstall(request.result[app_url])
 
 
-		var selected_button = $(":focus")[0];
-		var app_url = selected_button.getAttribute('data-url');
-		var app_name = selected_button.getAttribute('data-app_name');
-		var delete_request= navigator.mozApps.mgmt.uninstall(request.result[app_url])
+			delete_request.error = function(event)
+			{
+				alert("error: app not unistalled")
+			};
 
+			delete_request.onsuccess = function(event)
+			{
+				var text = app_name+" successfully uninstalled";
+				notify(text)
+				finder();
+				setTimeout(function(){
+					items = document.querySelectorAll('div#app-list > div.items');
+					$('div#app-list').find('div.items[tabindex=0]').focus();
+				},3000); 			
+			};
 
-		delete_request.error = function(event)
-		{
-			alert("error: app not unistalled")
-		};
-
-		delete_request.onsuccess = function(event)
-		{
-			var text = app_name+" successfully uninstalled";
-			notify(text)
-			finder();
-			setTimeout(function(){
-				items = document.querySelectorAll('div#app-list > div.items');
-				$('div#app-list').find('div.items[tabindex=0]').focus();
-			},3000); 			
-		};
-
+			}
 		}
 	}
 	
@@ -474,6 +570,34 @@ function delete_app()
 }
 
 
+
+//////////////////
+//CHECK FOR UPDATE
+//////////////////
+
+
+function checkUpdate()
+{
+
+	var request = window.navigator.mozApps.mgmt.getAll()
+	request.onsuccess = function() 
+	{
+		if (request.result)
+		{
+
+		var selected_button = $(":focus")[0];
+		var app_url = selected_button.getAttribute('data-url');
+		var output = request.result[app_url].checkForUpdate()
+
+		}
+	}
+
+
+}
+
+//////////////////
+//SHORTCUT
+//////////////////
 
 
 function focus_shortcut(shortcut_number)
@@ -486,6 +610,10 @@ function focus_shortcut(shortcut_number)
 		launchApp();
 	}
 }
+
+
+
+
 
 //////////////////
 //Quick-Settings
@@ -562,7 +690,7 @@ function bluetooth_toggle(param)
 				{
 					$("div#quick-settings div.bluetooth").css("opacity","0.5")
 					$("div#quick-settings div.bluetooth").css("font-style","italic")
-				}
+			}		
 
 				result.onerror = function () 
 				{
@@ -600,7 +728,17 @@ function bluetooth_toggle(param)
 					$("div#quick-settings div.airplane").css("opacity","0.5")
 					$("div#quick-settings div.airplane").css("font-style","italic")
 
-					
+					navigator.mozSetMessageHandler("bluetooth-pairing-request", function (message) {
+  // Get the information about the pairing request
+  var request = message.detail;
+
+  // Handle the pairing request. For this simple example, we're just logging
+  // the name of the remote device that wants to be paired with your device
+
+  alert(request.name);
+});
+
+
 
 				}
 
@@ -1319,8 +1457,10 @@ function func_interval()
 				if(press_time > 2)
 				{
 				longpress = true;
-				delete_app();
-				return;
+				}
+				if(press_time < 2)
+				{
+				longpress = false;
 				}
 			
 	}, 1000);
@@ -1332,37 +1472,56 @@ function func_interval()
 	//////////////////////////
 	////KEYPAD TRIGGER////////////
 	/////////////////////////
-function handleKeyUp(evt) 
+function handleKeyDown(evt) 
 
 {	
-		clearInterval(key_time)
 
 	switch (evt.key) 
 	{
 		case 'Enter':
-		
-
-if(longpress == false)
-{
-		
-					
-
-			launchApp();
-			quick_settings_toggle();
-			choice_location();
-		}
+			func_interval();
 
 		break;
+
+			case 'Backspace':
+			evt.preventDefault();
+			
+			if(dir_level == 0)
+					{window.close()}
+				dir_nav();
+			break; 
+
+		
 
 	}
 }
 
 
 
-	function handleKeyDown(evt) {
-			func_interval();
+	function handleKeyUp(evt) {
+			clearInterval(key_time)
+
 			switch (evt.key) {
 
+			case 'Enter':
+		if(longpress == false)
+		{
+			launchApp();
+			quick_settings_toggle();
+			choice_location();
+			
+		}
+
+		if(longpress == true)
+		{	
+			delete_app();
+		}
+		break;
+
+	case 'Backspace':
+			evt.preventDefault();
+			
+			break; 
 		
 
 
@@ -1389,8 +1548,11 @@ if(longpress == false)
 			break; 
 
 			
+		
+			
 
 			case '1':
+			//checkUpdate();
 			focus_shortcut(0)
 			break; 
 
