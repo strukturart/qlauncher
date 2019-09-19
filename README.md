@@ -31,10 +31,10 @@ custom-launcher
 		
 			"location":
 			{
-				"biel":
+				"brüssel":
 				{
-					"position_lat":"47.0",
-					"position_long":"7.0"
+					"position_lat":" 50.846557",
+					"position_long":"4.3516970"
 
 				},
 				"prag":
