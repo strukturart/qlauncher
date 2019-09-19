@@ -14,7 +14,7 @@
 	"developer": 
 	{
 		"name": "strukturart",
-		"url": "https://strukturart.com"
+		"url": "https://github.com/strukturart/custom-launcher"
 	},
 
 
@@ -44,6 +44,7 @@
 		},
 
 		"wifi-manage":{},
+		"bluetooth":{},
 
 
 		"spatialnavigation-app-manage": {
@@ -53,7 +54,6 @@
 		"systemXHR": {
 		"description": "Required to load remote content"
 		}
-
 
 
  
