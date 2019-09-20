@@ -288,7 +288,6 @@ finder()
 
 				}
 
-				
 			}		
 		}
 
@@ -321,9 +320,6 @@ finder()
 					items = document.querySelectorAll('div#weather-wrapper div#weather-locations > div.items');
 
 				}
-
-
-			
 			}
 		}
 
@@ -338,7 +334,8 @@ finder()
 /////////////////////////
 //LIST APPS
 /////////////////////////
-	
+	var last_dir;
+	var dirs = [];
 	function listApps(param)
 	{
 		z = -1
@@ -351,66 +348,82 @@ finder()
 			if (request.result) 
 			{
 
-			var data = request.result;
-
-
-
-			$.each(data, function(i, item) {
-				z++
-
-
-
-		//list all apps
-		if (param == true)
-			{
-				$("div#app-list").append('<div class="items" tabindex="0" data-url="'+z+'">'+item.manifest.name+'</div>');
-			}
-
-		else
-		{
-			for(var i = 0; i< app_list_filter_arr.length-1; i++)
-			{
-
-			if(app_list_filter_arr[i][0] == item.manifest.name)
-			{
-								
-			if(app_list_filter_arr[i][1] == "root")
-			{			
-				$("div#app-list").append('<div class="items" tabindex="0" data-app_name = "'+item.manifest.name+'"data-url="'+z+'">'+item.manifest.name+'</div>');
-			}
-
-			if(app_list_filter_arr[i][1] != "root")
-			{
-				//first element of dir
-				if(app_list_filter_arr[i][1] == app_list_filter_arr[i-1][1])
+				var data = request.result;
+				
+				//list all apps
+				if (param == true)
 				{
-					$("div#app-list").append('<div class="items dir child-of-dir '+app_list_filter_arr[i][1]+'" tabindex="0" data-app_name = "'+item.manifest.name+'"data-url="'+z+'"><span class="dir-name">'+app_list_filter_arr[i][1]+'</span><span class="app-name">'+item.manifest.name+'</span></div>');
+					$.each(data, function(i, item) {
+					z++
+				
+						$("div#app-list").append('<div class="items" tabindex="0" data-url="'+z+'">'+item.manifest.name+'</div>');
+					})
+
 				}
+
 				else
 				{
-					$("div#app-list").append('<div class="items dir  '+app_list_filter_arr[i][1]+'" tabindex="0" data-app_name = "'+item.manifest.name+'"data-url="'+z+'"><span class="dir-name">'+app_list_filter_arr[i][1]+'</span><span class="app-name">'+item.manifest.name+'</span></div>');
-				}
-			}
+					for(var k = 0; k< app_list_filter_arr.length-1; k++)
+					{
+
+
+						$.each(data, function(i, item)
+						{
+
+
 							
-			}
-		}
+							if (item.manifest.name == app_list_filter_arr[k][0]) 
+							{
+						
+									
+								if(app_list_filter_arr[k][1] == "root")
+								{			
+									$("div#app-list").append('<div class="items" tabindex="0" data-app_name = "'+item.manifest.name+'"data-url="'+i+'">'+item.manifest.name+'</div>');
+								}
 
-	}
+								if(app_list_filter_arr[k][1] != "root")
+								{
+									
+									if($.inArray(app_list_filter_arr[k][1], dirs) == -1)
+									{
+										dirs.push(app_list_filter_arr[k][1])
+										$("div#app-list").append('<div class="items dir  '+app_list_filter_arr[k][1]+'" tabindex="0" data-app_name = "'+item.manifest.name+'"data-url="'+i+'"><span class="dir-name">'+app_list_filter_arr[k][1]+'</span><span class="app-name">'+item.manifest.name+'</span></div>');
 
+									}
 
-			});
+										//first element of dir
+									else
+									{
+										$("div#app-list").append('<div class="items dir child-of-dir '+app_list_filter_arr[k][1]+'" tabindex="0" data-app_name = "'+item.manifest.name+'"data-url="'+i+'"><span class="dir-name">'+app_list_filter_arr[k][1]+'</span><span class="app-name">'+item.manifest.name+'</span></div>');
+									}
+									
+									
+									
+								}
+											
+							}
+							
+						})
+					}
+
+				}
 
 			items = $('div#app-list > div.items:visible');
 			pos_focus = 0;
+			//dir_view()
 			set_tabindex()
 
 
 			} 
+
+			
 			else 
 			{
 				alert("No apps");
 			}
 		};
+
+
 		request.onerror = function() {
 		// Display error name from the DOMError object
 		alert("Error: " + request.error.name);
@@ -431,9 +444,22 @@ function set_tabindex()
 			$(items[i]).attr('tabindex',i) 
 			pos_focus = 0
 			$('div#finder').find('div.items[tabindex=0]').focus();
-
 		}
 }
+
+
+
+function dir_view()
+{
+
+	for (var i = 0; i < dirs.length; i++) {
+		var test = document.getElementsByClassName(dirs[i])
+		$(test).addClass("child-of-dir")
+		$(test).first().removeClass("child-of-dir")
+	}
+set_tabindex()
+}
+
 
 
 function dir_nav()
@@ -444,11 +470,12 @@ function dir_nav()
 			$("div.items").children('.dir-name').css('display','block')
 			$("div.items").children('.app-name').css('display','none')
 			$("div.child-of-dir").css("display","none");
-			set_tabindex()
+			
 			$('div#finder').find('div.items[tabindex=0]').focus();
 			$('div#finder div#app-list .dir').css("border-left","4px solid silver")
 			pos_focus = 0
 			dir_level = 0;
+			set_tabindex()
 
 	}
 
@@ -469,17 +496,19 @@ function launchApp()
 		//if element is a dir
 		if($(selected_button).hasClass('dir') && dir_level == 0)
 		{
+
 			$("div.items").css("display","none");
 			var same_class = $("*:focus").eq(0).attr('class')	
 			var elems = document.getElementsByClassName(same_class);
 			$(elems).children('.dir-name').css('display','none')
 			$(elems).children('.app-name').css('display','block')
 			$(elems).css("display","block");
-			set_tabindex()
 			pos_focus = 0
 			$('div#finder').find('div.items[tabindex=0]').focus();
 			dir_level = 1;
 			$('div#finder div#app-list .dir').css("border","0px solid silver")
+			set_tabindex()
+
 
 			return;
 			
@@ -1397,10 +1426,11 @@ $("div#weather-wrapper div#message").css('display','none')
 
 function read_calendar()
 {
+	 console.log('hey');
 navigator.getDataStores('contacts').then(function(stores) {
   stores[0].get(1,2,3).then(function(obj) {
     for(i = 0; i <= obj.length; i++) {
-      alert(i);
+      console.log(i);
     }
   });
 });
