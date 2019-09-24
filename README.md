@@ -66,6 +66,12 @@ custom-launcher
 
 Calendar Page: List next coming events
 
+## Dependencies
+
+https://jquery.com/
+https://www.chartjs.org/
+
+
 ## Donation
 
 You like the app and you have enough money

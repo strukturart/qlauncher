@@ -1367,6 +1367,12 @@ var jqxhr = $.getJSON(request_url, function(data) {
 	//cloning elements
 	$('div#weather section').not(':first').remove();
 
+	var myLineChart = new Chart(ctx, {
+    type: 'line',
+    data: data,
+    options: options
+});
+
 
 	var template = $("section#forecast-0")
 	var k = -1;
