@@ -288,7 +288,6 @@ finder()
 
 				}
 
-				
 			}		
 		}
 
@@ -321,9 +320,6 @@ finder()
 					items = document.querySelectorAll('div#weather-wrapper div#weather-locations > div.items');
 
 				}
-
-
-			
 			}
 		}
 
@@ -335,20 +331,23 @@ finder()
 	}
 
 
-
 /////////////////////////
 //LIST APPS
 /////////////////////////
+<<<<<<< HEAD
 
 
 
 	var dir_first_child;
 
+=======
+	var last_dir;
+	var dirs = [];
+>>>>>>> master
 	function listApps(param)
 	{
 		z = -1
 		$("div#app-list").empty();
-		finderNav_tabindex = -1;
 		var request = window.navigator.mozApps.mgmt.getAll()
 
 
@@ -357,16 +356,29 @@ finder()
 			if (request.result) 
 			{
 
-			var data = request.result;
+				var data = request.result;
+				
+				//list all apps
+				if (param == true)
+				{
+					$.each(data, function(i, item) {
+					z++
+				
+						$("div#app-list").append('<div class="items" tabindex="0" data-url="'+z+'">'+item.manifest.name+'</div>');
+					})
+
+				}
+
+				else
+				{
+					for(var k = 0; k< app_list_filter_arr.length-1; k++)
+					{
 
 
+						$.each(data, function(i, item)
+						{
 
-			$.each(data, function(i, item) {
-				z++
-
-
-
-
+<<<<<<< HEAD
 		if (param == true)
 			{
 					finderNav_tabindex++;
@@ -409,21 +421,65 @@ finder()
 		}
 
 		}
+=======
 
+							
+							if (item.manifest.name == app_list_filter_arr[k][0]) 
+							{
+						
+									
+								if(app_list_filter_arr[k][1] == "root")
+								{			
+									$("div#app-list").append('<div class="items" tabindex="0" data-app_name = "'+item.manifest.name+'"data-url="'+i+'">'+item.manifest.name+'</div>');
+								}
+>>>>>>> master
 
-			});
+								if(app_list_filter_arr[k][1] != "root")
+								{
+									
+									if($.inArray(app_list_filter_arr[k][1], dirs) == -1)
+									{
+										dirs.push(app_list_filter_arr[k][1])
+										$("div#app-list").append('<div class="items dir  '+app_list_filter_arr[k][1]+'" tabindex="0" data-app_name = "'+item.manifest.name+'"data-url="'+i+'"><span class="dir-name">'+app_list_filter_arr[k][1]+'</span><span class="app-name">'+item.manifest.name+'</span></div>');
+
+									}
+
+										//first element of dir
+									else
+									{
+										$("div#app-list").append('<div class="items dir child-of-dir '+app_list_filter_arr[k][1]+'" tabindex="0" data-app_name = "'+item.manifest.name+'"data-url="'+i+'"><span class="dir-name">'+app_list_filter_arr[k][1]+'</span><span class="app-name">'+item.manifest.name+'</span></div>');
+									}
+									
+									
+									
+								}
+											
+							}
+							
+						})
+					}
+
+				}
 
 			items = $('div#app-list > div.items:visible');
 			pos_focus = 0;
+<<<<<<< HEAD
+=======
+			//dir_view()
+>>>>>>> master
 			set_tabindex()
 
 
 			} 
+
+			
 			else 
 			{
 				alert("No apps");
 			}
 		};
+
+
 		request.onerror = function() {
 		// Display error name from the DOMError object
 		alert("Error: " + request.error.name);
@@ -434,8 +490,35 @@ finder()
 
 
 
+function set_tabindex()
+{
+		var items_list = $('div#finder div.items:visible');
+		items = $('div#app-list > div.items:visible');
+		
+		for(var i =-1; i < items.length; i++)
+		{
+			$(items[i]).attr('tabindex',i) 
+			pos_focus = 0
+			$('div#finder').find('div.items[tabindex=0]').focus();
+		}
+}
 
 
+
+function dir_view()
+{
+
+	for (var i = 0; i < dirs.length; i++) {
+		var test = document.getElementsByClassName(dirs[i])
+		$(test).addClass("child-of-dir")
+		$(test).first().removeClass("child-of-dir")
+	}
+set_tabindex()
+}
+
+
+
+<<<<<<< HEAD
 
 
 function set_tabindex()
@@ -453,6 +536,8 @@ function set_tabindex()
 }
 
 
+=======
+>>>>>>> master
 function dir_nav()
 {
 	if(dir_level == 1)
@@ -460,12 +545,22 @@ function dir_nav()
 			$("div.items").css("display","block");
 			$("div.items").children('.dir-name').css('display','block')
 			$("div.items").children('.app-name').css('display','none')
+<<<<<<< HEAD
 			$("div.element-of-dir").css("display","none");
 			set_tabindex()
 			pos_focus = 0
 			$('div#finder').find('div.items[tabindex=0]').focus();
 			dir_level = 0;
 
+=======
+			$("div.child-of-dir").css("display","none");
+			
+			$('div#finder').find('div.items[tabindex=0]').focus();
+			$('div#finder div#app-list .dir').css("border-left","4px solid silver")
+			pos_focus = 0
+			dir_level = 0;
+			set_tabindex()
+>>>>>>> master
 
 	}
 
@@ -483,6 +578,7 @@ function launchApp()
 
 		var selected_button = $(":focus")[0];
 		var app_url = selected_button.getAttribute('data-url');
+<<<<<<< HEAD
 		if($(selected_button).hasClass('dir') && dir_level == 0)
 		{
 			$("div.items").css("display","none");
@@ -499,12 +595,36 @@ function launchApp()
 			$('div#finder').find('div.items[tabindex=0]').focus();
 			dir_level = 1;
 			return;
+=======
+		//if element is a dir
+		if($(selected_button).hasClass('dir') && dir_level == 0)
+		{
+>>>>>>> master
 
+			$("div.items").css("display","none");
+			var same_class = $("*:focus").eq(0).attr('class')	
+			var elems = document.getElementsByClassName(same_class);
+			$(elems).children('.dir-name').css('display','none')
+			$(elems).children('.app-name').css('display','block')
+			$(elems).css("display","block");
+			pos_focus = 0
+			$('div#finder').find('div.items[tabindex=0]').focus();
+			dir_level = 1;
+			$('div#finder div#app-list .dir').css("border","0px solid silver")
+			set_tabindex()
 
+<<<<<<< HEAD
 		
 
 			
 		}
+=======
+
+			return;
+			
+		}
+		//if element is not a dir start app
+>>>>>>> master
 		else
 		{
 			var request = window.navigator.mozApps.mgmt.getAll();
@@ -538,19 +658,37 @@ function delete_app()
 		var request = window.navigator.mozApps.mgmt.getAll()
 		request.onsuccess = function() {
 		if (request.result) {
+<<<<<<< HEAD
+=======
 
+>>>>>>> master
 
 			var selected_button = $(":focus")[0];
 			var app_url = selected_button.getAttribute('data-url');
 			var app_name = selected_button.getAttribute('data-app_name');
 			var delete_request= navigator.mozApps.mgmt.uninstall(request.result[app_url])
 
+<<<<<<< HEAD
+			var selected_button = $(":focus")[0];
+			var app_url = selected_button.getAttribute('data-url');
+			var app_name = selected_button.getAttribute('data-app_name');
+			var delete_request= navigator.mozApps.mgmt.uninstall(request.result[app_url])
+=======
+>>>>>>> master
 
 			delete_request.error = function(event)
 			{
 				alert("error: app not unistalled")
 			};
 
+<<<<<<< HEAD
+			delete_request.error = function(event)
+			{
+				alert("error: app not unistalled")
+			};
+
+=======
+>>>>>>> master
 			delete_request.onsuccess = function(event)
 			{
 				var text = app_name+" successfully uninstalled";
@@ -1358,6 +1496,12 @@ var jqxhr = $.getJSON(request_url, function(data) {
 	//cloning elements
 	$('div#weather section').not(':first').remove();
 
+	var myLineChart = new Chart(ctx, {
+    type: 'line',
+    data: data,
+    options: options
+});
+
 
 	var template = $("section#forecast-0")
 	var k = -1;
@@ -1417,29 +1561,14 @@ $("div#weather-wrapper div#message").css('display','none')
 
 function read_calendar()
 {
-
-	if (window.indexedDB) 
-	{
-		var db;
-		var request = window.indexedDB.open('b2g-calendar', 1);
-
-		request.onerror = function (event) 
-		{
-			alert("openDb:", event.target.errorCode);
-		};
-
-		request.onsuccess = function(event) 
-		{
-		db = this.result;
-		var transaction = db.transaction(["calendar"], "readwrite");
-
-		};
-
-
-	
-
-		
-	}
+	 console.log('hey');
+navigator.getDataStores('contacts').then(function(stores) {
+  stores[0].get(1,2,3).then(function(obj) {
+    for(i = 0; i <= obj.length; i++) {
+      console.log(i);
+    }
+  });
+});
 
 }
 
@@ -1591,8 +1720,8 @@ function handleKeyDown(evt)
 			break; 
 
 			case '0':
-			listApps(true);
-			//read_calendar()
+			//listApps(true);
+			read_calendar()
 			break; 
 
 
