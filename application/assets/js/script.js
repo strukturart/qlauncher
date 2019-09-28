@@ -11,7 +11,7 @@ $(document).ready(function()
 	var app_list_filter_arr = [];
 	var app_shortcut_arr = [];
 	var list_all = false;
-	var debug = true;
+	var debug = false;
 	var page = 0;
 	var pos_focus = 0
 	var locations = [];
@@ -33,6 +33,9 @@ $(document).ready(function()
 
 
 	$("div#window-status").text(windowOpen);
+
+
+
 
 
 //execute weather function once 
@@ -185,7 +188,7 @@ function notify(param_text) {
 					};
 					reader.readAsText(file)
 				});
-									$('div#finder').find('div.items[tabindex=0]').focus();
+				$('div#finder').find('div.items[tabindex=0]').focus();
 
 	}	
 
@@ -288,7 +291,6 @@ finder()
 
 				}
 
-				
 			}		
 		}
 
@@ -321,9 +323,6 @@ finder()
 					items = document.querySelectorAll('div#weather-wrapper div#weather-locations > div.items');
 
 				}
-
-
-			
 			}
 		}
 
@@ -335,20 +334,15 @@ finder()
 	}
 
 
-
 /////////////////////////
 //LIST APPS
 /////////////////////////
-
-
-
-	var dir_first_child;
-
+	var last_dir;
+	var dirs = [];
 	function listApps(param)
 	{
 		z = -1
 		$("div#app-list").empty();
-		finderNav_tabindex = -1;
 		var request = window.navigator.mozApps.mgmt.getAll()
 
 
@@ -357,73 +351,82 @@ finder()
 			if (request.result) 
 			{
 
-			var data = request.result;
-
-
-
-			$.each(data, function(i, item) {
-				z++
-
-
-
-
-		if (param == true)
-			{
-					finderNav_tabindex++;
-					$("div#app-list").append('<div class="items" tabindex="'+finderNav_tabindex+'" data-url="'+z+'">'+item.manifest.name+'</div>');
-			}
-
-		else
-		{
-			for(var i = 0; i< app_list_filter_arr.length-1; i++)
-			{
-
-			//var valid = jQuery.inArray(item.manifest.name, app_list_filter_arr[i][0])
-			//alert(valid)
-			if(item.manifest.name == app_list_filter_arr[i][0])
-			{
-								finderNav_tabindex++;
-
-			if(app_list_filter_arr[i][1] == "root")
-			{
-							
-				$("div#app-list").append('<div class="items" tabindex="0" data-app_name = "'+item.manifest.name+'"data-url="'+z+'">'+item.manifest.name+'</div>');
-			}
-							
-			if(app_list_filter_arr[i][1] != "root")
-			{
-							
-				if(dir_first_child == app_list_filter_arr[i][1])
+				var data = request.result;
+				
+				//list all apps
+				if (param == true)
 				{
-					$("div#app-list").append('<div class="items dir" tabindex="0" data-app_name = "'+item.manifest.name+'"data-url="'+z+'"><span class="dir-name">'+app_list_filter_arr[i][1]+'</span><span class="app-name">'+item.manifest.name+'</span></div>');
+					$.each(data, function(i, item) {
+					z++
+				
+						$("div#app-list").append('<div class="items" tabindex="0" data-url="'+z+'">'+item.manifest.name+'</div>');
+					})
+
 				}
+
 				else
 				{
-					$("div#app-list").append('<div class="items dir element-of-dir" tabindex="0" data-app_name = "'+item.manifest.name+'"data-url="'+z+'"><span class="dir-name">'+app_list_filter_arr[i][1]+'</span><span class="app-name">'+item.manifest.name+'</span></div>');
+					for(var k = 0; k< app_list_filter_arr.length-1; k++)
+					{
+
+
+						$.each(data, function(i, item)
+						{
+
+
+							
+							if (item.manifest.name == app_list_filter_arr[k][0]) 
+							{
+						
+									
+								if(app_list_filter_arr[k][1] == "root")
+								{			
+									$("div#app-list").append('<div class="items" tabindex="0" data-app_name = "'+item.manifest.name+'"data-url="'+i+'">'+item.manifest.name+'</div>');
+								}
+
+								if(app_list_filter_arr[k][1] != "root")
+								{
+									
+									if($.inArray(app_list_filter_arr[k][1], dirs) == -1)
+									{
+										dirs.push(app_list_filter_arr[k][1])
+										$("div#app-list").append('<div class="items dir  '+app_list_filter_arr[k][1]+'" tabindex="0" data-app_name = "'+item.manifest.name+'"data-url="'+i+'"><span class="dir-name">'+app_list_filter_arr[k][1]+'</span><span class="app-name">'+item.manifest.name+'</span></div>');
+
+									}
+
+										//first element of dir
+									else
+									{
+										$("div#app-list").append('<div class="items dir child-of-dir '+app_list_filter_arr[k][1]+'" tabindex="0" data-app_name = "'+item.manifest.name+'"data-url="'+i+'"><span class="dir-name">'+app_list_filter_arr[k][1]+'</span><span class="app-name">'+item.manifest.name+'</span></div>');
+									}
+									
+									
+									
+								}
+											
+							}
+							
+						})
+					}
+
 				}
-				dir_first_child = app_list_filter_arr[i][1]
-			}
-				
-
-			}
-		}
-
-		}
-
-
-			});
 
 			items = $('div#app-list > div.items:visible');
 			pos_focus = 0;
+			//dir_view()
 			set_tabindex()
 
 
 			} 
+
+			
 			else 
 			{
 				alert("No apps");
 			}
 		};
+
+
 		request.onerror = function() {
 		// Display error name from the DOMError object
 		alert("Error: " + request.error.name);
@@ -431,10 +434,6 @@ finder()
 		
 
 	}
-
-
-
-
 
 
 
@@ -448,9 +447,22 @@ function set_tabindex()
 			$(items[i]).attr('tabindex',i) 
 			pos_focus = 0
 			$('div#finder').find('div.items[tabindex=0]').focus();
-
 		}
 }
+
+
+
+function dir_view()
+{
+
+	for (var i = 0; i < dirs.length; i++) {
+		var test = document.getElementsByClassName(dirs[i])
+		$(test).addClass("child-of-dir")
+		$(test).first().removeClass("child-of-dir")
+	}
+set_tabindex()
+}
+
 
 
 function dir_nav()
@@ -460,12 +472,13 @@ function dir_nav()
 			$("div.items").css("display","block");
 			$("div.items").children('.dir-name').css('display','block')
 			$("div.items").children('.app-name').css('display','none')
-			$("div.element-of-dir").css("display","none");
-			set_tabindex()
-			pos_focus = 0
+			$("div.child-of-dir").css("display","none");
+			
 			$('div#finder').find('div.items[tabindex=0]').focus();
+			$('div#finder div#app-list .dir').css("border-left","4px solid silver")
+			pos_focus = 0
 			dir_level = 0;
-
+			set_tabindex()
 
 	}
 
@@ -483,28 +496,27 @@ function launchApp()
 
 		var selected_button = $(":focus")[0];
 		var app_url = selected_button.getAttribute('data-url');
+		//if element is a dir
 		if($(selected_button).hasClass('dir') && dir_level == 0)
 		{
-			$("div.items").css("display","none");
 
-			var same_class = $("*:focus").eq(0).attr('class')
-		
-			
+			$("div.items").css("display","none");
+			var same_class = $("*:focus").eq(0).attr('class')	
 			var elems = document.getElementsByClassName(same_class);
 			$(elems).children('.dir-name').css('display','none')
 			$(elems).children('.app-name').css('display','block')
 			$(elems).css("display","block");
-			set_tabindex()
 			pos_focus = 0
 			$('div#finder').find('div.items[tabindex=0]').focus();
 			dir_level = 1;
+			$('div#finder div#app-list .dir').css("border","0px solid silver")
+			set_tabindex()
+
+
 			return;
-
-
-		
-
 			
 		}
+		//if element is not a dir start app
 		else
 		{
 			var request = window.navigator.mozApps.mgmt.getAll();
@@ -1248,6 +1260,9 @@ function select_location()
 	}
 }
 
+
+
+
 function choice_location()
 {
 
@@ -1258,67 +1273,98 @@ function choice_location()
 		var selected_button = $(":focus")[0];
 		current_lng = selected_button.getAttribute('data-long');
 		current_lat = selected_button.getAttribute('data-lat');
+		location_name = $(selected_button).text();
+		$("h1#location_name").text(location_name);
 
 
-		$("div#weather-wrapper div#locations").css("display","none")
-		$("div#weather-wrapper div#location").css("display","block")
-		weather("notgeolocation")
+		$("div#weather-wrapper div#locations").css("display","none");
+		$("div#weather-wrapper div#location").css("display","block");
+		weather("notgeolocation");
+
 
 	}
 }
 
 
+function getCityName()
+{
 
+	var request_url = "https://nominatim.openstreetmap.org/reverse?format=json&lat="+current_lat+"&lon="+current_lng+"&zoom=18&addressdetails=1";
+	var jqxhr = $.getJSON(request_url, function(data) {
+
+	}).done(function(data) {
+		  $.each(data.address, function(key, val) {
+if(key === "town")
+{
+     $("h1#location_name").text(val);
+ }
+
+      });
+	})
+	.fail(function() {
+		alert("error")
+	})
+	.always(function() {
+	});
+
+}
+
+
+
+var weather_data = [];
 
 function weather(param)
 {
 
+	weather_data.length = 0;
+	
+	if(param == "geolocation")
+	{
+		var options = {
+		enableHighAccuracy: true,
+		timeout: 30000,
+		maximumAge: 0
+		};
+
+		function success(pos) {
+		var crd = pos.coords;
 
 
-if(param == "geolocation")
-{
-	var options = {
-	enableHighAccuracy: true,
-	timeout: 30000,
-	maximumAge: 0
-	};
 
-	function success(pos) {
-	var crd = pos.coords;
+			current_lng = crd.longitude;
+			current_lat = crd.latitude;
+			fetch_weather_data()
+			getCityName()
 
+		}
 
+		function error(err) {
+		 alert("Position not found"+err.code+":"+err.message);
+		 select_location();
+		}
 
-		current_lng = crd.longitude;
-		current_lat = crd.latitude;
-		fetch_weather_data()
+		navigator.geolocation.getCurrentPosition(success, error, options);
+	}
+
+	else
+	{
+		fetch_weather_data();
+		updateChart();
 
 	}
 
-	function error(err) {
-	 alert(err.code+":"+err.message);
-	}
 
-	navigator.geolocation.getCurrentPosition(success, error, options);
-}
 
-else
-{
-	fetch_weather_data()
 
-}
 
 function fetch_weather_data()
 {
 
 var request_url = "https://api.openweathermap.org/data/2.5/forecast?lat="+current_lat+"&lon="+current_lng+"&units=metric&APPID="+openweather_api;
 var jqxhr = $.getJSON(request_url, function(data) {
-  //alert( "success" );
 
 })
   .done(function(data) {
-    //alert( "second success" );
-
-    
 
   var wind_dir = "";
 	function direction(in_val)
@@ -1355,50 +1401,73 @@ var jqxhr = $.getJSON(request_url, function(data) {
 	}
 
 
+
+
+
 	//cloning elements
 	$('div#weather section').not(':first').remove();
+	//$("div#weather section").first().css("display","block")
+
 
 
 	var template = $("section#forecast-0")
-	var k = -1;
+	var k = 0;
+
 	for (var i = 0; i < 20; i++) 
 	{ 
 		k++;
 		//create elements
 		template.clone()
-		.attr("id","forecast-"+i)
+		.attr("id","forecast-"+k)
 		.appendTo('div#weather');
 
 		//add data
-		var day = moment.unix(data.list[k].dt).format("DD");
+
+		
+			var date_format = moment.unix(data.list[i].dt).format("ddd DD MMM HH:mm");
+			var date_format_hhmm = moment.unix(data.list[i].dt).format("HH:mm");
+			var temp = Math.round(data.list[i].main.temp);
+			var rain_data = 0;
+
 			
-		if(Math.ceil(day/2) == day/2)
-		{
-			$('div#location section#forecast-'+k).addClass('day-style-2');
-		} 
-		else 
-		{
-			$('div#location section#forecast-'+k).addClass('day-style-1');
-		}
-			var date_format = moment.unix(data.list[k].dt).format("ddd DD MMM HH:mm")
+			if(data.list[i].rain != undefined)
+			{
+				rain_data = data.list[i].rain["3h"];
+				rain_data = Number(rain_data)
+			}
+			else
+			{
+				rain_data = 0;
+			}
+
+
+
+
+
 
 		direction(i)
 		
 
-		$('div#location section#forecast-'+i+' div#temp').text(Math.round(data.list[k].main.temp)+"°");
-		$('div#location section#forecast-'+i+' div#wind div#wind-speed div#wind-speed-val').text(data.list[k].wind.speed);
+		$('div#location section#forecast-'+i+' div#temp').text(Math.round(data.list[i].main.temp)+"°");
+		$('div#location section#forecast-'+i+' div#wind div#wind-speed div#wind-speed-val').text(data.list[i].wind.speed);
 		$('div#location section#forecast-'+i+' div#wind div#wind-dir').text(wind_dir);
-		$('div#location section#forecast-'+i+' div#pressure div#pressure-val').text(Math.round(data.list[k].main.pressure));
+		$('div#location section#forecast-'+i+' div#pressure div#pressure-val').text(Math.round(data.list[i].main.pressure));
 		$('div#location section#forecast-'+i+' div.title div.forecast-time').text(date_format);
-		$('div#location section#forecast-'+i+' div#icon img').attr("src","https://openweathermap.org/img/w/"+data.list[k].weather[0].icon+".png");
+		$('div#location section#forecast-'+i+' div#icon img').attr("src","https://openweathermap.org/img/w/"+data.list[i].weather[0].icon+".png");
+
+
+		 weather_data.push([date_format_hhmm,temp,rain_data])
+	}
+
+	$("div#weather-wrapper div#message").css('display','none')
+	$("div#location").css('display','block')
+	//$("div#weather section").first().css("display","none")
+
 
 
 		
-	}
-
-$("div#weather-wrapper div#message").css('display','none')
-
-	$("div#location").css('display','block')
+	//chart
+ 	addChart()
 
 
   })
@@ -1412,34 +1481,88 @@ $("div#weather-wrapper div#message").css('display','none')
 
 }
 
+}
+
+var mixedChart;
+
+ function addChart()
+ {
+ 	
+	var ctx = document.getElementById('myChart');
+	var ctx = document.getElementById('myChart').getContext('2d');
+
+	mixedChart = new Chart(ctx, {
+	   type: 'line',
+	  data: {
+	    
+	    datasets: [{
+	      label: 'temp',
+	      yAxisID: 'id1',
+	      data: [weather_data[0][1], weather_data[1][1], weather_data[2][1], weather_data[3][1]],
+	      borderColor:'rgba(255,0,0,1)'
+	    }, {
+	      label: 'rain',
+	      yAxisID: 'id2',
+	      data: [weather_data[0][2],weather_data[1][2],weather_data[2][2],weather_data[3][2]],
+	      borderColor:'rgba(0,0,255,1)'
+	    
+	    }],
+	    labels: [weather_data[0][0], weather_data[1][0], weather_data[2][0], weather_data[3][0]]
+	  },
+	    options: {
+	        legend: {
+	            display: false,
+	            labels: {
+	              
+	                position: 'bottom'
+	            }
+	        },
+	           
+	    scales: {
+	      yAxes: [{
+	        id: 'id1',
+	        type: 'linear',
+	        position: 'left',
+	      }, {
+	        id: 'id2',
+	        type: 'linear',
+	        position: 'right',
+			ticks: {
+				min: 0
+			}
+
+	      }]
+	    }
+
+	  
+	    }
+	 
+	});
  }
+
+
+	//update chart
+	function updateChart()
+	{
+		mixedChart.update();
+	}
+
+
+
+
+
 
 
 function read_calendar()
 {
-
-	if (window.indexedDB) 
-	{
-		var db;
-		var request = window.indexedDB.open('b2g-calendar', 1);
-
-		request.onerror = function (event) 
-		{
-			alert("openDb:", event.target.errorCode);
-		};
-
-		request.onsuccess = function(event) 
-		{
-		db = this.result;
-		var transaction = db.transaction(["calendar"], "readwrite");
-
-		};
-
-
-	
-
-		
-	}
+	 console.log('hey');
+navigator.getDataStores('contacts').then(function(stores) {
+  stores[0].get(1,2,3).then(function(obj) {
+    for(i = 0; i <= obj.length; i++) {
+      console.log(i);
+    }
+  });
+});
 
 }
 
@@ -1591,8 +1714,8 @@ function handleKeyDown(evt)
 			break; 
 
 			case '0':
-			listApps(true);
-			//read_calendar()
+			//listApps(true);
+			read_calendar()
 			break; 
 
 

@@ -45,6 +45,12 @@ html,body
 
 
 
+h1
+{
+	margin:0 0 20px 0;
+	font-size:1.2rem;
+}
+
 
 
 /*///////////////////////////
@@ -106,16 +112,19 @@ div#finder div#app-list
 	overflow:hidden;
 }
 
-div#finder div#app-list .element-of-dir
+div#finder div#app-list .child-of-dir
 {
 	display:none;
 }
 
 div#finder div#app-list .dir
 {
-	border-left:4px solid blue;
+	border-left:4px solid silver;
 	padding:0 0 0 3px;
 }
+
+
+
 
 div#finder div#app-list .dir span.app-name
 {
@@ -126,6 +135,7 @@ div#finder div#app-list .dir span.app-name
 div#finder div#app-list div
 {
 	min-width:100%;
+	margin:0 0 5px 0;
 }
 
 
@@ -180,6 +190,38 @@ div#calendar-event-list
 /*///////////////////////////
 ///LOCATION////////////////*/
 
+div#chart
+{
+	position: relative;
+	margin: 25px 0 10px 0;
+	height: 240px;
+	width: 99vw;
+	max-width: 99vw;
+}
+
+div#chart #myChart
+{
+	margin:0 0 0 -5px!Important;
+}
+
+div#chart div.legend span
+{
+	margin:5px 5px 0 0;
+	
+
+}
+
+div#chart div.legend span:first-child 
+{
+	color:red;
+}
+
+div#chart div.legend span:nth-child(2) 
+{
+	color:blue;
+}
+
+
 
 div#location
 {
@@ -204,6 +246,12 @@ div#weather-wrapper div#locations
 	top:0px;
 	left:0px;
 }
+
+div#weather-wrapper div#locations:first-child
+{
+	outline:2px solid red;
+}
+
 
 div#weather-wrapper div#locations div
 {
@@ -249,6 +297,7 @@ div#location div#weather section
 	border-top:2px dashed white;
 	margin: 0 0 0px 0;
 	padding:12px 5px 12px 5px;
+	background:black;
 
 }
 
@@ -287,12 +336,12 @@ div#location div#weather div#wind-speed div#wind-speed-unit
 
 .day-style-1
 {
-	background:rgba(0,0,255,0.6);
+	//background:rgba(0,0,255,0.6);
 }
 
 .day-style-2
 {
-	background:rgba(11,135,61,0.6);
+	//background:rgba(11,135,61,0.6);
 }
 
 
