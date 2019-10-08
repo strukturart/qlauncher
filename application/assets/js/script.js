@@ -671,6 +671,27 @@ function quick_settings_toggle()
 ///BLUETOOTH///////
 /////////////
 
+function unlock_setting()
+{
+					var lock = navigator.mozSettings.createLock();
+
+					var unlock_result = lock.clear();
+					unlock_result.onsuccess = function () {
+					  alert("the queue has been cleared");
+					}
+
+					unlock_result.onerror = function () {
+					  alert("An error occure, the queue remain unchanged");
+					}
+
+				}
+
+navigator.mozSettings.addObserver('bluetooth.enabled', function (event) {
+  //alert('bluetooth.enabled: ' + event.settingValue);
+  unlock_setting()
+
+});
+
 function bluetooth_toggle(param)
 {
 
@@ -739,18 +760,6 @@ function bluetooth_toggle(param)
 
 					$("div#quick-settings div.airplane").css("opacity","0.5")
 					$("div#quick-settings div.airplane").css("font-style","italic")
-
-					navigator.mozSetMessageHandler("bluetooth-pairing-request", function (message) {
-  // Get the information about the pairing request
-  var request = message.detail;
-
-  // Handle the pairing request. For this simple example, we're just logging
-  // the name of the remote device that wants to be paired with your device
-
-  alert(request.name);
-});
-
-
 
 				}
 
