@@ -687,8 +687,8 @@ function unlock_setting()
 				}
 
 navigator.mozSettings.addObserver('bluetooth.enabled', function (event) {
-  //alert('bluetooth.enabled: ' + event.settingValue);
-  unlock_setting()
+					
+
 
 });
 
@@ -721,8 +721,10 @@ function bluetooth_toggle(param)
 
 				result.onsuccess = function () 
 				{
+					navigator.mozBluetooth.defaultAdapter.disable();
 					$("div#quick-settings div.bluetooth").css("opacity","0.5")
 					$("div#quick-settings div.bluetooth").css("font-style","italic")
+
 			}		
 
 				result.onerror = function () 
@@ -755,11 +757,13 @@ function bluetooth_toggle(param)
 
 				result.onsuccess = function () 
 				{
+
 					$("div#quick-settings div.bluetooth").css("opacity","1")
 					$("div#quick-settings div.bluetooth").css("font-style","normal")
 
 					$("div#quick-settings div.airplane").css("opacity","0.5")
 					$("div#quick-settings div.airplane").css("font-style","italic")
+					navigator.mozBluetooth.defaultAdapter.enable();
 
 				}
 
@@ -1561,21 +1565,6 @@ var mixedChart;
 
 
 
-
-function read_calendar()
-{
-	 console.log('hey');
-navigator.getDataStores('contacts').then(function(stores) {
-  stores[0].get(1,2,3).then(function(obj) {
-    for(i = 0; i <= obj.length; i++) {
-      console.log(i);
-    }
-  });
-});
-
-}
-
-
 var key_time
 var press_time = 0;
 var longpress = false;
@@ -1723,8 +1712,8 @@ function handleKeyDown(evt)
 			break; 
 
 			case '0':
-			//listApps(true);
-			read_calendar()
+			listApps(true);
+			//read_calendar()
 			break; 
 
 
