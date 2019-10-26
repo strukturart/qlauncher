@@ -52,6 +52,17 @@ h1
 }
 
 
+h2
+{
+	font-size:1.0rem;
+}
+
+
+.debug
+{
+	border:1px solid red;
+}
+
 
 /*///////////////////////////
 ///HELPER////////////////*/
@@ -172,6 +183,20 @@ div#quick-settings div:focus
 	background:yellow;
 	color:black;
 }
+
+div#quick-settings div.alarms
+{
+	margin:15px 0 0 0;
+}
+
+div#quick-settings div.alarms div
+{
+	padding:0 10px 0 0;
+}
+
+div#quick-settings div.alarms div:first:after
+{
+	content: "-";
 
 
 div#calendar-event-list

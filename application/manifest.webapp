@@ -17,11 +17,18 @@
 		"url": "https://github.com/strukturart/custom-launcher"
 	},
 
+	"messages": [
+	{ "alarm": "/index.html" }
+	],
+
 
 	"permissions": 
 	{
 
 		"desktop-notification":{},
+		"alarms": {
+      	"description": "Required to schedule alarms"
+    	},
 
 		"geolocation": {
 		"description": "Required to show user's location"

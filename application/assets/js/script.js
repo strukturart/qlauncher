@@ -11,7 +11,7 @@ $(document).ready(function()
 	var app_list_filter_arr = [];
 	var app_shortcut_arr = [];
 	var list_all = false;
-	var debug = false;
+	var debug = true;
 	var page = 0;
 	var pos_focus = 0
 	var locations = [];
@@ -30,10 +30,15 @@ $(document).ready(function()
 	var pages_arr = [];
 
 
+	var startTime;
+	var duration_h = 0;
+	var duration_m = 0;
+	var sleepModeState;
 
 
-	$("div#window-status").text(windowOpen);
 
+
+$("div#window-status").text(windowOpen);
 
 
 
@@ -49,11 +54,17 @@ $(document).ready(function()
 	    };
 	})();
 
+////////////////////
+//NOTFICATION//////
+//////////////////
 
-function notify(param_text) {
+
+
+function notify(param_title,param_text,param_silent) {
 
 	  var options = {
-      body: param_text
+      body: param_text,
+      silent: param_silent
   }
   // Let's check if the browser supports notifications
   if (!("Notification" in window)) {
@@ -63,7 +74,7 @@ function notify(param_text) {
   // Let's check whether notification permissions have already been granted
   else if (Notification.permission === "granted") {
     // If it's okay let's create a notification
-     var notification = new Notification("App uninstall",options);
+     var notification = new Notification(param_title,options);
 
   }
 
@@ -72,7 +83,7 @@ function notify(param_text) {
     Notification.requestPermission().then(function (permission) {
       // If the user accepts, let's create a notification
       if (permission === "granted") {
-        var notification = new Notification("App uninstall",options);
+        var notification = new Notification(param_title,options);
 
 
       }
@@ -81,12 +92,166 @@ function notify(param_text) {
 
 }
 
+/////////////////
+////Sleep Mode///
+////////////////
+function sleep()
+{
+	//init local storage item
+	sleepModeState = localStorage.getItem("sleepMode")
+	if(sleepModeState === null)
+	{
+		localStorage.setItem("sleepMode","false")
+		sleepModeState = localStorage.getItem("sleepMode","false")
+	}
+
+	
+	function remove_alarms()
+	{
+		var request = navigator.mozAlarms.getAll();
+
+		request.onsuccess = function () 
+		{
+			
+
+		  this.result.forEach(function (alarm) {
+		  	
+		  	navigator.mozAlarms.remove(alarm.id);
+		  	$('div.alarms div.time').empty();
+
+		  	
+		  });
+		  console.log('operation successful:' + this.result.length + 'alarms pending');
+		};
+
+		request.onerror = function () 
+		{ 
+		  console.log("An error occurred: " + this.error.name);
+		};
+	}
+
+
+
+
+	function getAlarms()
+	{
+		var request = navigator.mozAlarms.getAll();
+		request.onsuccess = function () 
+		{
+			//$('div.alarms div.time').append("<div class='grid-col-6'>"+this.result.length+"</div")
+			this.result.forEach(function (alarm) {
+				var dateFormat =  moment(alarm.date).format("dd.MM, HH:mm");
+				$('div.alarms div.time').append("<div class='grid-col-100'>"+dateFormat+"</div")
+				getAlarmState()
+			});
+		};
+	}
 
 
 
 
 
-	/////////////////////////
+	function set_alarm(alarm_date,message_text)
+	{
+
+		var request = navigator.mozAlarms.add(new Date(alarm_date), "honorTimezone", { "message": message_text });
+
+		request.onsuccess = function () 
+		{
+			console.log(this.result)
+			getAlarmState()
+
+		}
+
+		request.onerror = function () 
+		{
+		  alert('operation failed: ' + this.error);
+		}
+	}
+
+
+	navigator.mozSetMessageHandler("alarm", function (mozAlarm) { 
+		var getData = JSON.stringify(mozAlarm.data)
+		if(sleepModeState == "false")
+		{
+			if(mozAlarm.data["message"] == "Start")
+			{
+				//notify("alarm","Start", true);
+				airplan_strict("off");
+			}
+			if(mozAlarm.data["message"] == "End")
+			{
+				//notify("alarm","End", true);
+				airplan_strict("on");
+			}
+		}
+
+	});
+
+	//get timestamp current date-time 
+	var today = moment().format("YYYY-MM-DD")
+	var time = startTime; 
+	//var m = moment(today+"T"+time).format("DD.MM.YYYY, HH:mm:ss")
+	var m = moment(today+"T"+time).valueOf()
+	//set the alarm end
+	var n = moment(m).add(duration_h, 'hours').add(duration_m, 'minute')
+
+
+	function alarmInterval(startTime,endTime)
+	{
+
+		set_alarm(startTime,"Start",true)
+		set_alarm(endTime,"End",true)
+		
+
+	}
+
+	//remove all alarms
+	remove_alarms();
+	//check if user paused the alarms
+	getAlarmState();
+
+
+	setTimeout(
+	function() 
+	{
+		alarmInterval(m,n)
+		getAlarms()
+
+
+	}, 3000);
+
+
+
+
+
+}
+
+
+function getAlarmState()
+{
+	sleepModeState = localStorage.getItem("sleepMode")
+	if(sleepModeState == "true")
+	{
+		$('div.alarms div.time div').css("opacity","0.5")
+		$('div.alarms div.time div').css("font-style","italic")
+	}
+	if(sleepModeState == "false")
+	{
+		$('div.alarms div.time div').css("opacity","1")
+		$('div.alarms div.time div').css("font-style","normal")
+
+	}
+
+}
+
+
+	/////////////////////////////
+	//////FINDER////////////////
+	///////////////////////////
+
+
+
 	function finder()
 	{
 	app_list_filter_arr.length = 0;
@@ -168,6 +333,18 @@ function notify(param_text) {
 											$.each(item.weather.location, function(k, item_location) {
 												locations.push([k,item_location.position_lat,item_location.position_long])
 											})
+										}
+
+
+										if(item.sleep_mode)
+										{
+											startTime = item.sleep_mode.startTime;
+											duration_h = item.sleep_mode.duration_h;
+											duration_m = item.sleep_mode.duration_m;
+
+
+											sleep()
+
 										}
 								
 									});
@@ -291,6 +468,13 @@ finder()
 
 				}
 
+
+				if(pages_arr[page] == "dev")
+				{
+					ble_test();
+
+				}
+
 			}		
 		}
 
@@ -323,6 +507,13 @@ finder()
 					items = document.querySelectorAll('div#weather-wrapper div#weather-locations > div.items');
 
 				}
+
+				
+				if(pages_arr[page] == "dev")
+				{
+					ble_test();
+
+				}
 			}
 		}
 
@@ -337,6 +528,10 @@ finder()
 /////////////////////////
 //LIST APPS
 /////////////////////////
+
+
+
+
 	var last_dir;
 	var dirs = [];
 	function listApps(param)
@@ -399,8 +594,6 @@ finder()
 									{
 										$("div#app-list").append('<div class="items dir child-of-dir '+app_list_filter_arr[k][1]+'" tabindex="0" data-app_name = "'+item.manifest.name+'"data-url="'+i+'"><span class="dir-name">'+app_list_filter_arr[k][1]+'</span><span class="app-name">'+item.manifest.name+'</span></div>');
 									}
-									
-									
 									
 								}
 											
@@ -485,6 +678,29 @@ function dir_nav()
 
 }
 
+
+/////DEV/////
+/////////////
+
+function ble_test()
+{
+var gatt = device.gatt;
+if (gatt && gatt.connectionState === "connected") 
+{
+  gatt.readRemoteRssi()
+
+
+}
+else
+{
+	alert("not connected")
+}
+
+}
+
+
+
+
 //////////////////
 //LAUNCH APP
 //////////////////
@@ -566,7 +782,7 @@ function delete_app()
 			delete_request.onsuccess = function(event)
 			{
 				var text = app_name+" successfully uninstalled";
-				notify(text)
+				notify("App",text)
 				finder();
 				setTimeout(function(){
 					items = document.querySelectorAll('div#app-list > div.items');
@@ -583,29 +799,6 @@ function delete_app()
 
 
 
-//////////////////
-//CHECK FOR UPDATE
-//////////////////
-
-
-function checkUpdate()
-{
-
-	var request = window.navigator.mozApps.mgmt.getAll()
-	request.onsuccess = function() 
-	{
-		if (request.result)
-		{
-
-		var selected_button = $(":focus")[0];
-		var app_url = selected_button.getAttribute('data-url');
-		var output = request.result[app_url].checkForUpdate()
-
-		}
-	}
-
-
-}
 
 //////////////////
 //SHORTCUT
@@ -661,8 +854,92 @@ function quick_settings_toggle()
 			case (quick_settings_item == "airplane"):
 			airplane_toggle("set");
 			break;
+
+			case (quick_settings_item == "sleep"):
+				sleepModeState = localStorage.getItem("sleepMode")
+				
+				if(sleepModeState == "true")
+				{
+					localStorage.setItem("sleepMode","false")
+				}
+
+				if(sleepModeState == "false")
+				{
+					localStorage.setItem("sleepMode","true")
+				}
+
+				getAlarmState()
+
+			break;
 		}
 		
+	}
+}
+
+
+
+function airplan_strict(param)
+{
+	if(param == "on")
+	{
+		var lock = navigator.mozSettings.createLock();
+			var result = lock.set({
+			'bluetooth.enabled': true,
+			'wifi.enabled': true,
+			'ril.data.enabled': true,
+			'ril.radio.disabled': false	
+
+
+			});
+
+			result.onsuccess = function () 
+			{
+				//navigator.mozBluetooth.defaultAdapter.enable();
+				$("div#quick-settings div.bluetooth").css("opacity","1")
+				$("div#quick-settings div.bluetooth").css("font-style","normal")
+				$("div#quick-settings div.wifi").css("opacity","1")
+				$("div#quick-settings div.wifi").css("font-style","normal")
+				$("div#quick-settings div.mobile-data").css("opacity","1")
+				$("div#quick-settings div.mobile-data").css("font-style","normal")
+
+			}		
+
+			result.onerror = function () 
+			{
+				alert("An error occure, the settings remain unchanged");
+			}
+	
+	}
+
+	if(param == "off")
+	{
+		var lock = navigator.mozSettings.createLock();
+			var result = lock.set({
+			'bluetooth.enabled': false,
+			'wifi.enabled': false,
+			'ril.data.enabled': false,
+			'ril.radio.disabled': true	
+
+
+			});
+
+			result.onsuccess = function () 
+			{
+				//navigator.mozBluetooth.defaultAdapter.disable();
+				$("div#quick-settings div.bluetooth").css("opacity","0.5")
+				$("div#quick-settings div.bluetooth").css("font-style","italic")
+				$("div#quick-settings div.wifi").css("opacity","0.5")
+				$("div#quick-settings div.wifi").css("font-style","italic")
+				$("div#quick-settings div.mobile-data").css("opacity","0.5")
+				$("div#quick-settings div.mobile-data").css("font-style","italic")
+
+			}		
+
+			result.onerror = function () 
+			{
+				alert("An error occure, the settings remain unchanged");
+			}
+	
 	}
 }
 
@@ -671,26 +948,7 @@ function quick_settings_toggle()
 ///BLUETOOTH///////
 /////////////
 
-function unlock_setting()
-{
-					var lock = navigator.mozSettings.createLock();
 
-					var unlock_result = lock.clear();
-					unlock_result.onsuccess = function () {
-					  alert("the queue has been cleared");
-					}
-
-					unlock_result.onerror = function () {
-					  alert("An error occure, the queue remain unchanged");
-					}
-
-				}
-
-navigator.mozSettings.addObserver('bluetooth.enabled', function (event) {
-					
-
-
-});
 
 function bluetooth_toggle(param)
 {
@@ -822,7 +1080,7 @@ function wifi_toggle(param)
 			{
 				var lock = navigator.mozSettings.createLock();
 				var result = lock.set({
-				'wifi.enabled': false
+					'wifi.enabled': false
 				});
 
 				result.onsuccess = function () 
@@ -1036,7 +1294,8 @@ function airplane_toggle(param)
 		var result = lock.set({
 		'bluetooth.enabled': false,
 		'wifi.enabled': false,
-		'ril.data.enabled': false
+		'ril.data.enabled': false,
+		'ril.radio.disabled': true	
 
 		});
 
@@ -1072,7 +1331,9 @@ function airplane_toggle(param)
 		var result = lock.set({
 		'bluetooth.enabled': true,
 		'wifi.enabled': true,
-		'ril.data.enabled': true
+		'ril.data.enabled': true,
+		'ril.radio.disabled': false
+
 
 		});
 
@@ -1608,7 +1869,9 @@ function handleKeyDown(evt)
 			evt.preventDefault();
 			
 			if(dir_level == 0)
-					{window.close()}
+					{
+						window.close();
+					}
 				dir_nav();
 			break; 
 
@@ -1622,38 +1885,34 @@ function handleKeyDown(evt)
 	function handleKeyUp(evt) {
 			clearInterval(key_time)
 
-			switch (evt.key) {
+		switch (evt.key) {
 
-			case 'Enter':
-		if(longpress == false)
-		{
-			launchApp();
-			quick_settings_toggle();
-			choice_location();
-			
-		}
+		case 'Enter':
+			if(longpress == false)
+			{
+				launchApp();
+				quick_settings_toggle();
+				choice_location();
+				
+			}
 
-		if(longpress == true)
-		{	
-			delete_app();
-		}
+			if(longpress == true)
+			{	
+				delete_app();
+			}
 		break;
 
-	case 'Backspace':
+		case 'Backspace':
 			evt.preventDefault();
-			
-			break; 
+		break; 
 		
+		case 'ArrowDown':
+			nav("+1")
+		break; 
 
-
-			case 'ArrowDown':
-				nav("+1")
-			break; 
-
-
-			case 'ArrowUp':
-				nav("-1")
-			break; 
+		case 'ArrowUp':
+			nav("-1")
+		break; 
 
 			case 'ArrowRight':
 				nav("slide_right")
@@ -1669,9 +1928,6 @@ function handleKeyDown(evt)
 			break; 
 
 			
-		
-			
-
 			case '1':
 			//checkUpdate();
 			focus_shortcut(0)
@@ -1713,7 +1969,6 @@ function handleKeyDown(evt)
 
 			case '0':
 			listApps(true);
-			//read_calendar()
 			break; 
 
 

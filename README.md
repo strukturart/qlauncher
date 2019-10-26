@@ -6,6 +6,13 @@ custom-launcher
 ![image-4](/images/image-4.png)
 
 
+## Features
+
+- Start apps
+- enable/disaple bluetooth,wifi,mobile-data,tethering, airplain
+- sleep mode
+- weather forecast
+
 ## Installation
 
 
@@ -25,6 +32,15 @@ custom-launcher
 	{"app_name":"shellCMD", "dir":"tools"},
 	{"app_name":"Note", "dir":"tools"},
 	{"app_name":"Calendar"},
+
+	{
+		"sleep_mode":
+		{
+			"startTime":"22:40",
+			"duration_h":"8",
+			"duration_m":"0"
+		}
+	},
 
 	{
 		"weather":
@@ -61,6 +77,7 @@ custom-launcher
 + Navigation up/right/down/left
 + Start apps or toggle options enter
 + on the app page press 0 to show all apps
++ sleep mode pause: select the time and press enter
 
 
 
