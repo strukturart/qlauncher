@@ -11,7 +11,7 @@ $(document).ready(function()
 	var app_list_filter_arr = [];
 	var app_shortcut_arr = [];
 	var list_all = false;
-	var debug = true;
+	var debug = false;
 	var page = 0;
 	var pos_focus = 0
 	var locations = [];
@@ -25,7 +25,6 @@ $(document).ready(function()
 
 	var items = "";
 
-	var airplane_mode = true;
 
 	var pages_arr = [];
 
@@ -33,8 +32,29 @@ $(document).ready(function()
 	var startTime;
 	var duration_h = 0;
 	var duration_m = 0;
-	var sleepModeState;
 
+	//TO-DO
+	//to know how the settings was before turn on or off
+	//save the data in a localStorage item
+
+
+
+	var sleepModeState;
+	var bluetoothState
+	var wifiState
+	var mobileDataState
+	var tetheringState
+	var airplaneState = "true"
+
+
+	function getSettingState()
+	{
+
+		bluetoothState = localStorage.getItem("bluetooth")
+		wifiState = localStorage.getItem("wifi")
+		mobileDataState = localStorage.getItem("mobileData")
+		tetheringState = localStorage.getItem("tethering")
+	}
 
 
 
@@ -99,10 +119,10 @@ function sleep()
 {
 	//init local storage item
 	sleepModeState = localStorage.getItem("sleepMode")
-	if(sleepModeState === null)
+	if(sleepModeState == null)
 	{
 		localStorage.setItem("sleepMode","false")
-		sleepModeState = localStorage.getItem("sleepMode","false")
+		sleepModeState = localStorage.getItem("sleepMode")
 	}
 
 	
@@ -140,10 +160,28 @@ function sleep()
 		{
 			//$('div.alarms div.time').append("<div class='grid-col-6'>"+this.result.length+"</div")
 			this.result.forEach(function (alarm) {
-				var dateFormat =  moment(alarm.date).format("dd.MM, HH:mm");
+				var dateFormat =  moment(alarm.date).format("DD.MM, HH:mm");
 				$('div.alarms div.time').append("<div class='grid-col-100'>"+dateFormat+"</div")
-				getAlarmState()
+
+
+
+				if(sleepModeState == "true")
+				{
+					$('div.alarms div.time div').css("opacity","1")
+					$('div.alarms div.time div').css("font-style","normal")
+				}
+
+				if(sleepModeState == "false")
+				{
+					$('div.alarms div.time div').css("opacity","0.5")
+					$('div.alarms div.time div').css("font-style","italic")
+				}
+				
+			
 			});
+
+
+			
 		};
 	}
 
@@ -159,7 +197,6 @@ function sleep()
 		request.onsuccess = function () 
 		{
 			console.log(this.result)
-			getAlarmState()
 
 		}
 
@@ -172,17 +209,22 @@ function sleep()
 
 	navigator.mozSetMessageHandler("alarm", function (mozAlarm) { 
 		var getData = JSON.stringify(mozAlarm.data)
-		if(sleepModeState == "false")
+		if(sleepModeState == "true")
 		{
 			if(mozAlarm.data["message"] == "Start")
 			{
 				//notify("alarm","Start", true);
-				airplan_strict("off");
+				bluetooth_toggle("off");
+				wifi_toggle("off");
+				data_toggle("off");
 			}
 			if(mozAlarm.data["message"] == "End")
 			{
 				//notify("alarm","End", true);
-				airplan_strict("on");
+				bluetooth_toggle("on");
+				wifi_toggle("on");
+				data_toggle("on");
+				
 			}
 		}
 
@@ -191,10 +233,14 @@ function sleep()
 	//get timestamp current date-time 
 	var today = moment().format("YYYY-MM-DD")
 	var time = startTime; 
-	//var m = moment(today+"T"+time).format("DD.MM.YYYY, HH:mm:ss")
 	var m = moment(today+"T"+time).valueOf()
 	//set the alarm end
 	var n = moment(m).add(duration_h, 'hours').add(duration_m, 'minute')
+
+
+
+
+
 
 
 	function alarmInterval(startTime,endTime)
@@ -203,47 +249,48 @@ function sleep()
 		set_alarm(startTime,"Start",true)
 		set_alarm(endTime,"End",true)
 		
+	}
+
+	//if not between start and end
+	if(m < moment() && n > moment())
+	{
+		console.log("alarm: between start and end")
+	}
+	else
+	{
+
+		//remove all alarms
+		remove_alarms();
+		//check if user paused the alarms
+		sleepModeState = localStorage.getItem("sleepMode")
+
+
+		//set alarm
+	
+		setTimeout(
+		function() 
+		{
+		
+			alarmInterval(m,n)
+			getAlarms()
+
+
+		}, 3000);
 
 	}
 
-	//remove all alarms
-	remove_alarms();
-	//check if user paused the alarms
-	getAlarmState();
-
-
-	setTimeout(
-	function() 
-	{
-		alarmInterval(m,n)
-		getAlarms()
-
-
-	}, 3000);
-
-
-
-
-
-}
-
-
-function getAlarmState()
-{
-	sleepModeState = localStorage.getItem("sleepMode")
-	if(sleepModeState == "true")
-	{
-		$('div.alarms div.time div').css("opacity","0.5")
-		$('div.alarms div.time div').css("font-style","italic")
-	}
-	if(sleepModeState == "false")
-	{
-		$('div.alarms div.time div').css("opacity","1")
-		$('div.alarms div.time div').css("font-style","normal")
 
 	}
 
-}
+
+
+
+
+
+
+
+
+
 
 
 	/////////////////////////////
@@ -323,10 +370,10 @@ function getAlarmState()
 										{
 											openweather_api = item.weather.owm_api_key;
 
-										if(openweather_api == "")
-										{
-											$("div#weather-wrapper").remove()
-										}
+											if(openweather_api == "")
+											{
+												$("div#weather-wrapper").remove()
+											}
 
 									
 
@@ -679,25 +726,6 @@ function dir_nav()
 }
 
 
-/////DEV/////
-/////////////
-
-function ble_test()
-{
-var gatt = device.gatt;
-if (gatt && gatt.connectionState === "connected") 
-{
-  gatt.readRemoteRssi()
-
-
-}
-else
-{
-	alert("not connected")
-}
-
-}
-
 
 
 
@@ -835,40 +863,51 @@ function quick_settings_toggle()
 		switch (true)
 		{
 			case (quick_settings_item == "bluetooth"):
-			bluetooth_toggle("set");
+			bluetooth_toggle("toggle");
 			break;
 
 			case (quick_settings_item == "wifi"):
-			wifi_toggle("set");
+			wifi_toggle("toggle");
 			break;
 
 			case (quick_settings_item == "mobile_data"):
-			data_toggle("set");
+			data_toggle("toggle");
 			break;
 
 
 			case (quick_settings_item == "tethering"):
-			tethering_toggle("set");
+			tethering_toggle("toggle");
 			break;
 
 			case (quick_settings_item == "airplane"):
-			airplane_toggle("set");
+			airplane_toggle("toggle");
 			break;
 
+			///alarm on/off
 			case (quick_settings_item == "sleep"):
 				sleepModeState = localStorage.getItem("sleepMode")
+
+			
 				
 				if(sleepModeState == "true")
 				{
 					localStorage.setItem("sleepMode","false")
+					$('div.alarms div.time div').css("opacity","0.5")
+					$('div.alarms div.time div').css("font-style","italic")
+					return
+					
+					
 				}
 
 				if(sleepModeState == "false")
 				{
 					localStorage.setItem("sleepMode","true")
+					$('div.alarms div.time div').css("opacity","1")
+					$('div.alarms div.time div').css("font-style","normal")
+					
 				}
 
-				getAlarmState()
+				
 
 			break;
 		}
@@ -878,80 +917,19 @@ function quick_settings_toggle()
 
 
 
-function airplan_strict(param)
-{
-	if(param == "on")
-	{
-		var lock = navigator.mozSettings.createLock();
-			var result = lock.set({
-			'bluetooth.enabled': true,
-			'wifi.enabled': true,
-			'ril.data.enabled': true,
-			'ril.radio.disabled': false	
-
-
-			});
-
-			result.onsuccess = function () 
-			{
-				//navigator.mozBluetooth.defaultAdapter.enable();
-				$("div#quick-settings div.bluetooth").css("opacity","1")
-				$("div#quick-settings div.bluetooth").css("font-style","normal")
-				$("div#quick-settings div.wifi").css("opacity","1")
-				$("div#quick-settings div.wifi").css("font-style","normal")
-				$("div#quick-settings div.mobile-data").css("opacity","1")
-				$("div#quick-settings div.mobile-data").css("font-style","normal")
-
-			}		
-
-			result.onerror = function () 
-			{
-				alert("An error occure, the settings remain unchanged");
-			}
-	
-	}
-
-	if(param == "off")
-	{
-		var lock = navigator.mozSettings.createLock();
-			var result = lock.set({
-			'bluetooth.enabled': false,
-			'wifi.enabled': false,
-			'ril.data.enabled': false,
-			'ril.radio.disabled': true	
-
-
-			});
-
-			result.onsuccess = function () 
-			{
-				//navigator.mozBluetooth.defaultAdapter.disable();
-				$("div#quick-settings div.bluetooth").css("opacity","0.5")
-				$("div#quick-settings div.bluetooth").css("font-style","italic")
-				$("div#quick-settings div.wifi").css("opacity","0.5")
-				$("div#quick-settings div.wifi").css("font-style","italic")
-				$("div#quick-settings div.mobile-data").css("opacity","0.5")
-				$("div#quick-settings div.mobile-data").css("font-style","italic")
-
-			}		
-
-			result.onerror = function () 
-			{
-				alert("An error occure, the settings remain unchanged");
-			}
-	
-	}
-}
-
 
 ///////////////
 ///BLUETOOTH///////
 /////////////
+///toggle --- toggle setting
+///get --- to know the current state
+///on / off ---- enable / disable strict
 
 
 
 function bluetooth_toggle(param)
 {
+
 
 	var lock    = navigator.mozSettings.createLock();
 	var setting = lock.get('bluetooth.enabled');
@@ -960,8 +938,62 @@ function bluetooth_toggle(param)
 
 	setting.onsuccess = function () 
 	{
+		//strict
+		if(param == "on")
+		{
+			var lock = navigator.mozSettings.createLock();
+			var result = lock.set({
+			'bluetooth.enabled': true
+			});
+
+			result.onsuccess = function () 
+			{
+				navigator.mozBluetooth.defaultAdapter.enable();
+				$("div#quick-settings div.bluetooth").css("opacity","1")
+				$("div#quick-settings div.bluetooth").css("font-style","normal")
+				localStorage.setItem("bluetooth","true")
+				airplaneState = "false"
+				airplane_toggle("get");
 
 
+
+			}		
+
+			result.onerror = function () 
+			{
+				alert("An error occure, the settings remain unchanged");
+			}
+
+		}
+
+		if(param == "off")
+		{
+			var lock = navigator.mozSettings.createLock();
+			var result = lock.set({
+			'bluetooth.enabled': false
+			});
+			
+
+
+			result.onsuccess = function () 
+			{
+				navigator.mozBluetooth.defaultAdapter.disable();
+				$("div#quick-settings div.bluetooth").css("opacity","0.5")
+				$("div#quick-settings div.bluetooth").css("font-style","italic")
+				localStorage.setItem("bluetooth","false")
+			}		
+
+			result.onerror = function () 
+			{
+				alert("An error occure, the settings remain unchanged");
+			}
+
+	
+		}
+
+
+
+		//toogle
 		var callback = JSON.stringify(setting.result);
 
 
@@ -970,33 +1002,22 @@ function bluetooth_toggle(param)
 		{
 			
 
-			if(param == "set")
+			if(param == "toggle")
 			{
-				var lock = navigator.mozSettings.createLock();
-				var result = lock.set({
-				'bluetooth.enabled': false
-				});
-
-				result.onsuccess = function () 
-				{
-					navigator.mozBluetooth.defaultAdapter.disable();
-					$("div#quick-settings div.bluetooth").css("opacity","0.5")
-					$("div#quick-settings div.bluetooth").css("font-style","italic")
-
-			}		
-
-				result.onerror = function () 
-				{
-					alert("An error occure, the settings remain unchanged");
-				}
+				bluetooth_toggle("off");
 
 			}
 
+
+
 			if(param == "get")
 			{
-				airplane_mode = false;
 				$("div#quick-settings div.bluetooth").css("opacity","1")
 				$("div#quick-settings div.bluetooth").css("font-style","normal")
+				localStorage.setItem("bluetooth","true")
+				airplaneState = "false"
+
+
 
 			}
 
@@ -1006,38 +1027,22 @@ function bluetooth_toggle(param)
 
 		if(callback == '{"bluetooth.enabled":false}')
 		{
-			if(param == "set")
+			if(param == "toggle")
 			{
-				var lock = navigator.mozSettings.createLock();
-				var result = lock.set({
-				'bluetooth.enabled': true
-				});
-
-				result.onsuccess = function () 
-				{
-
-					$("div#quick-settings div.bluetooth").css("opacity","1")
-					$("div#quick-settings div.bluetooth").css("font-style","normal")
-
-					$("div#quick-settings div.airplane").css("opacity","0.5")
-					$("div#quick-settings div.airplane").css("font-style","italic")
-					navigator.mozBluetooth.defaultAdapter.enable();
-
-				}
-
-				result.onerror = function () 
-				{
-					alert("An error occure, the settings remain unchanged");
-				}
+				
+				bluetooth_toggle("on");
 
 			}
-
+				
 			if(param == "get")
 			{
 				$("div#quick-settings div.bluetooth").css("opacity","0.5")
 				$("div#quick-settings div.bluetooth").css("font-style","italic")
+				localStorage.setItem("bluetooth","false")
 
 			}
+
+
 		};
 
 	}
@@ -1057,8 +1062,10 @@ function bluetooth_toggle(param)
 ///WIFI///////
 /////////////
 
+
 function wifi_toggle(param)
 {
+
 
 	var lock    = navigator.mozSettings.createLock();
 	var setting = lock.get('wifi.enabled');
@@ -1067,40 +1074,78 @@ function wifi_toggle(param)
 
 	setting.onsuccess = function () 
 	{
+		//strict
+		if(param == "on")
+		{
+			var lock = navigator.mozSettings.createLock();
+			var result = lock.set({
+			'wifi.enabled': true
+			});
+
+			result.onsuccess = function () 
+			{
+				$("div#quick-settings div.wifi").css("opacity","1")
+				$("div#quick-settings div.wifi").css("font-style","normal")
+				localStorage.setItem("wifi","true")
+				airplaneState = "false"
+				airplane_toggle("get");	
+
+			}		
+
+			result.onerror = function () 
+			{
+				alert("An error occure, the settings remain unchanged");
+			}
+
+		}
+
+		if(param == "off")
+		{
+			var lock = navigator.mozSettings.createLock();
+			var result = lock.set({
+			'wifi.enabled': false
+			});
 
 
+			result.onsuccess = function () 
+			{
+				$("div#quick-settings div.wifi").css("opacity","0.5")
+				$("div#quick-settings div.wifi").css("font-style","italic")
+				localStorage.setItem("wifi","false")
+			}		
+
+			result.onerror = function () 
+			{
+				alert("An error occure, the settings remain unchanged");
+			}
+
+	
+		}
+
+
+
+		//toogle
 		var callback = JSON.stringify(setting.result);
 
 
 		
 		if(callback == '{"wifi.enabled":true}')
 		{
+			
 
-			if(param == "set")
+			if(param == "toggle")
 			{
-				var lock = navigator.mozSettings.createLock();
-				var result = lock.set({
-					'wifi.enabled': false
-				});
-
-				result.onsuccess = function () 
-				{
-					$("div#quick-settings div.wifi").css("opacity","0.5")
-					$("div#quick-settings div.wifi").css("font-style","italic")
-				}
-
-				result.onerror = function () 
-				{
-					alert("An error occure, the settings remain unchanged");
-				}
+				wifi_toggle("off");
 
 			}
+
 
 			if(param == "get")
 			{
 				$("div#quick-settings div.wifi").css("opacity","1")
 				$("div#quick-settings div.wifi").css("font-style","normal")
-				airplane_mode = false;
+				localStorage.setItem("wifi","true")
+				airplaneState = "false"
 
 
 			}
@@ -1111,39 +1156,22 @@ function wifi_toggle(param)
 
 		if(callback == '{"wifi.enabled":false}')
 		{
-
-			if(param == "set")
+			if(param == "toggle")
 			{
-				var lock = navigator.mozSettings.createLock();
-				var result = lock.set({
-				'wifi.enabled': true
-				});
-
-				result.onsuccess = function () 
-				{
-					$("div#quick-settings div.wifi").css("opacity","1")
-					$("div#quick-settings div.wifi").css("font-style","normal")
-
-					$("div#quick-settings div.airplane").css("opacity","0.5")
-					$("div#quick-settings div.airplane").css("font-style","italic")
-
-				}
-
-				result.onerror = function () 
-				{
-					alert("An error occure, the settings remain unchanged");
-				}
+				
+				wifi_toggle("on");
 
 			}
-
+				
 			if(param == "get")
 			{
 				$("div#quick-settings div.wifi").css("opacity","0.5")
 				$("div#quick-settings div.wifi").css("font-style","italic")
-				airplane_mode = false;
-
+				localStorage.setItem("wifi","false")
 
 			}
+
+
 		};
 
 	}
@@ -1160,12 +1188,15 @@ function wifi_toggle(param)
 
 
 
+
 /////////////////////////
 ///DATA CONNECTION///////
 ////////////////////////
 
+
 function data_toggle(param)
 {
+
 
 	var lock    = navigator.mozSettings.createLock();
 	var setting = lock.get('ril.data.enabled');
@@ -1174,43 +1205,83 @@ function data_toggle(param)
 
 	setting.onsuccess = function () 
 	{
+		//strict
+		if(param == "on")
+		{
+			var lock = navigator.mozSettings.createLock();
+			var result = lock.set({
+			'ril.data.enabled': true,
+			'ril.radio.disabled': false	
+			});
+
+			result.onsuccess = function () 
+			{
+
+
+				$("div#quick-settings div.mobile-data").css("opacity","1")
+				$("div#quick-settings div.mobile-data").css("font-style","normal")
+				localStorage.setItem("mobileData","true")
+				airplaneState = "false"
+				airplane_toggle("get");
+				
+			}		
+
+			result.onerror = function () 
+			{
+				alert("An error occure, the settings remain unchanged");
+			}
+
+		}
+
+		if(param == "off")
+		{
+			var lock = navigator.mozSettings.createLock();
+			var result = lock.set({
+			'ril.data.enabled': false,
+			'ril.radio.disabled': true	
+			});
+
+
+			result.onsuccess = function () 
+			{
+				$("div#quick-settings div.mobile-data").css("opacity","0.5")
+				$("div#quick-settings div.mobile-data").css("font-style","italic")
+				localStorage.setItem("mobileData","false")
+			}		
+
+			result.onerror = function () 
+			{
+				alert("An error occure, the settings remain unchanged");
+			}
+
+	
+		}
 
 
 
+		//toogle
 		var callback = JSON.stringify(setting.result);
+
 
 		
 		if(callback == '{"ril.data.enabled":true}')
 		{
+			
 
-			if(param == "set")
+			if(param == "toggle")
 			{
-				var lock = navigator.mozSettings.createLock();
-				var result = lock.set({
-				'ril.data.enabled': false
-				});
-
-				result.onsuccess = function () 
-				{
-					$("div#quick-settings div.mobile-data").css("opacity","0.5")
-					$("div#quick-settings div.mobile-data").css("font-style","italic")
-				}
-
-				result.onerror = function () 
-				{
-					alert("An error occure, the settings remain unchanged");
-				}
+				data_toggle("off");
 
 			}
+
+
 
 			if(param == "get")
 			{
 				$("div#quick-settings div.mobile-data").css("opacity","1")
 				$("div#quick-settings div.mobile-data").css("font-style","normal")
-				airplane_mode = false;
-				airplane_toggle("get");
-
-
+				localStorage.setItem("mobileData","true")
+				airplaneState = "false"
 
 			}
 
@@ -1220,38 +1291,22 @@ function data_toggle(param)
 
 		if(callback == '{"ril.data.enabled":false}')
 		{
-		
-
-			if(param == "set")
+			if(param == "toggle")
 			{
-				var lock = navigator.mozSettings.createLock();
-				var result = lock.set({
-				'ril.data.enabled': true
-				});
-
-				result.onsuccess = function () 
-				{
-					$("div#quick-settings div.mobile-data").css("opacity","1")
-					$("div#quick-settings div.mobile-data").css("font-style","normal")
-					
-					$("div#quick-settings div.airplane").css("opacity","0.5")
-					$("div#quick-settings div.airplane").css("font-style","italic")
-
-				}
-
-				result.onerror = function () 
-				{
-					alert("An error occure, the settings remain unchanged");
-				}
+				
+				data_toggle("on");
 
 			}
-
+				
 			if(param == "get")
 			{
 				$("div#quick-settings div.mobile-data").css("opacity","0.5")
 				$("div#quick-settings div.mobile-data").css("font-style","italic")
+				localStorage.setItem("mobileData","false")
 
 			}
+
+
 		};
 
 	}
@@ -1266,158 +1321,119 @@ function data_toggle(param)
 }
 
 
-
-function airplane_toggle(param)
-{
-	if(param == "get")
-	{
-		if(airplane_mode == true)
-		{
-			$("div#quick-settings div.airplane").css("opacity","1")
-			$("div#quick-settings div.airplane").css("font-style","normal")
-
-		}
-		if(airplane_mode == false)
-		{
-			$("div#quick-settings div.airplane").css("opacity","0.5")
-			$("div#quick-settings div.airplane").css("font-style","italic")
-
-		}
-
-	}
-
-
-	if(param == "set" && airplane_mode == false)
-	{
-
-		var lock = navigator.mozSettings.createLock();
-		var result = lock.set({
-		'bluetooth.enabled': false,
-		'wifi.enabled': false,
-		'ril.data.enabled': false,
-		'ril.radio.disabled': true	
-
-		});
-
-		result.onsuccess = function () 
-		{
-			$("div#quick-settings div.bluetooth").css("opacity","0.5")
-			$("div#quick-settings div.bluetooth").css("font-style","italic")
-
-			$("div#quick-settings div.wifi").css("opacity","0.5")
-			$("div#quick-settings div.wifi").css("font-style","italic")
-
-			$("div#quick-settings div.mobile-data").css("opacity","0.5")
-			$("div#quick-settings div.mobile-data").css("font-style","italic")
-
-			$("div#quick-settings div.airplane").css("opacity","1")
-			$("div#quick-settings div.airplane").css("font-style","normal")
-
-			airplane_mode = true
-		}
-
-		result.onerror = function () 
-		{
-			alert("An error occure, the settings remain unchanged");
-		}
-
-	}
-
-	if(param == "set" && airplane_mode == true)
-	{
-
-
-		var lock = navigator.mozSettings.createLock();
-		var result = lock.set({
-		'bluetooth.enabled': true,
-		'wifi.enabled': true,
-		'ril.data.enabled': true,
-		'ril.radio.disabled': false
-
-
-		});
-
-		result.onsuccess = function () 
-		{
-			$("div#quick-settings div.bluetooth").css("opacity","1")
-			$("div#quick-settings div.bluetooth").css("font-style","normal")
-
-			$("div#quick-settings div.wifi").css("opacity","1")
-			$("div#quick-settings div.wifi").css("font-style","normal")
-
-			$("div#quick-settings div.mobile-data").css("opacity","1")
-			$("div#quick-settings div.mobile-data").css("font-style","normal")
-
-			$("div#quick-settings div.airplane").css("opacity","0.5")
-			$("div#quick-settings div.airplane").css("font-style","italic")
-
-			airplane_mode = false
-		}
-
-		result.onerror = function () 
-		{
-			alert("An error occure, the settings remain unchanged");
-		}
-
-	}
-
-	
-}
-
-
-
-
 ///////////////////
 ///TETHERING///////
 //////////////////
 
-	
+
 function tethering_toggle(param)
 {
+
 
 	var lock    = navigator.mozSettings.createLock();
 	var setting = lock.get('tethering.wifi.enabled');
 
 
 
-
-
-
 	setting.onsuccess = function () 
 	{
+		//strict
+		if(param == "on")
+		{
+			var lock = navigator.mozSettings.createLock();
+			var result = lock.set({
+			'tethering.wifi.enabled': true
+			});
+
+			result.onsuccess = function () 
+			{
 
 
+				$("div#quick-settings div.tethering").css("opacity","1")
+				$("div#quick-settings div.tethering").css("font-style","normal")
+				localStorage.setItem("tethering","true")
+
+				//get PWD
+				var getPWD = lock.get('tethering.wifi.security.password');
+				getPWD.onsuccess = function () 
+				{
+									
+
+					var stringify_result = JSON.stringify(getPWD.result)
+					var callback = JSON.parse(stringify_result)
+					$("div#message-box").css("display","block")
+					$("div#message-box").text(callback['tethering.wifi.security.password'])
+
+
+					setTimeout(function() {
+						$("div#message-box").text("");
+						$("div#message-box").css("display","none");
+					}, 10000);
+
+				}
+
+				getPWD.onerror = function () 
+				{
+					alert("Can't show password")
+				}
+
+
+			}		
+
+			result.onerror = function () 
+			{
+				alert("An error occure, the settings remain unchanged");
+			}
+
+		}
+
+		if(param == "off")
+		{
+			var lock = navigator.mozSettings.createLock();
+			var result = lock.set({
+			'tethering.wifi.enabled': false
+			});
+
+
+			result.onsuccess = function () 
+			{
+				$("div#quick-settings div.tethering").css("opacity","0.5")
+				$("div#quick-settings div.tethering").css("font-style","italic")
+				localStorage.setItem("tethering","false")
+			}		
+
+			result.onerror = function () 
+			{
+				alert("An error occure, the settings remain unchanged");
+			}
+
+	
+		}
+
+
+
+		//toogle
 		var callback = JSON.stringify(setting.result);
+
 
 		
 		if(callback == '{"tethering.wifi.enabled":true}')
 		{
+			
 
-			if(param == "set")
+			if(param == "toggle")
 			{
-				var lock = navigator.mozSettings.createLock();
-				var result = lock.set({
-				'tethering.wifi.enabled': false
-				});
-
-				result.onsuccess = function () 
-				{
-					$("div#quick-settings div.tethering").css("opacity","0.5")
-					$("div#quick-settings div.tethering").css("font-style","italic")
-				}
-
-				result.onerror = function () 
-				{
-					alert("An error occure, the settings remain unchanged");
-				}
+				tethering_toggle("off");
 
 			}
+
+
 
 			if(param == "get")
 			{
 				$("div#quick-settings div.tethering").css("opacity","1")
 				$("div#quick-settings div.tethering").css("font-style","normal")
-
+				localStorage.setItem("tethering","true")
 
 			}
 
@@ -1427,53 +1443,22 @@ function tethering_toggle(param)
 
 		if(callback == '{"tethering.wifi.enabled":false}')
 		{
-
-			if(param == "set")
+			if(param == "toggle")
 			{
-				var lock = navigator.mozSettings.createLock();
-				var setting_tethering = lock.set({
-				'tethering.wifi.enabled': true
-				});
-
-				setting_tethering.onsuccess = function () 
-				{
-
-					$("div#quick-settings div.tethering").css("opacity","1");
-					$("div#quick-settings div.tethering").css("font-style","normal");
-
-					//get PWD
-					var getPWD = lock.get('tethering.wifi.security.password');
-					getPWD.onsuccess = function () 
-					{
-						var stringify_result = JSON.stringify(getPWD.result)
-						var callback = JSON.parse(stringify_result)
-
-						$("div#message-box").text(callback['tethering.wifi.security.password'])
-						$("div#message-box").css("display","block")
-
-
-						setTimeout(function() {
-							$("div#message-box").text("");
-							$("div#message-box").css("display","none");
-						}, 10000);
-
-					}
-
-				}
-
-				setting_tethering.onerror = function () 
-				{
-					alert("An error occure, the settings remain unchanged");
-				}
+				
+				tethering_toggle("on");
 
 			}
-
+				
 			if(param == "get")
 			{
 				$("div#quick-settings div.tethering").css("opacity","0.5")
 				$("div#quick-settings div.tethering").css("font-style","italic")
+				localStorage.setItem("tethering","false")
 
 			}
+
+
 		};
 
 	}
@@ -1489,8 +1474,71 @@ function tethering_toggle(param)
 
 
 
+/////AIRPLANE
 
 
+
+function airplane_toggle(param)
+{
+	if(param == "toggle" && airplaneState == "true")
+	{
+		airplane_toggle("off")
+		airplaneState = "false"
+		return
+	}
+
+	if(param == "toggle" && airplaneState == "false")
+	{
+		airplane_toggle("on")
+		airplaneState = "true"
+		
+	}
+
+
+
+
+	if(param == "off")
+	{
+		$("div#quick-settings div.airplane").css("opacity","0.5")
+		$("div#quick-settings div.airplane").css("font-style","italic")
+		//
+		bluetooth_toggle("on")
+		wifi_toggle("on")
+		data_toggle("on")
+
+	}
+
+	if(param == "on")
+	{
+		$("div#quick-settings div.airplane").css("opacity","1")
+		$("div#quick-settings div.airplane").css("font-style","normal")
+		//airplaneState = "true"
+		bluetooth_toggle("off")
+		wifi_toggle("off")
+		data_toggle("off")
+		
+	}
+
+	if(param = "get")
+	{
+
+		
+		if(airplaneState == "true")
+		{
+			$("div#quick-settings div.airplane").css("opacity","1")
+			$("div#quick-settings div.airplane").css("font-style","normal")
+		}
+
+		if(airplaneState == "false")
+		{
+			$("div#quick-settings div.airplane").css("opacity","0.5")
+			$("div#quick-settings div.airplane").css("font-style","italic")
+		}
+	}
+
+
+		
+}
 
 
 
@@ -1500,6 +1548,15 @@ bluetooth_toggle("get");
 data_toggle("get");
 tethering_toggle("get");
 
+
+	setTimeout(
+		function() 
+		{
+		
+			airplane_toggle("get");
+
+
+		}, 1000);
 
 
 
@@ -1516,7 +1573,6 @@ function select_location()
 
 	k = -1;
 	$("div#weather-wrapper div#locations").empty();
-
 	for(var i = 0; i < locations.length; i++)
 	{
 		k++;
@@ -1568,10 +1624,10 @@ function getCityName()
 
 	}).done(function(data) {
 		  $.each(data.address, function(key, val) {
-if(key === "town")
-{
-     $("h1#location_name").text(val);
- }
+	if(key === "town")
+	{
+	     $("h1#location_name").text(val);
+	 }
 
       });
 	})
@@ -1826,6 +1882,10 @@ var mixedChart;
 
 
 
+
+
+
+
 var key_time
 var press_time = 0;
 var longpress = false;
@@ -1862,6 +1922,8 @@ function handleKeyDown(evt)
 	{
 		case 'Enter':
 			func_interval();
+			quick_settings_toggle();
+
 
 		break;
 
@@ -1891,7 +1953,6 @@ function handleKeyDown(evt)
 			if(longpress == false)
 			{
 				launchApp();
-				quick_settings_toggle();
 				choice_location();
 				
 			}

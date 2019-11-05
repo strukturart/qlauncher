@@ -197,19 +197,8 @@ div#quick-settings div.alarms div
 div#quick-settings div.alarms div:first:after
 {
 	content: "-";
-
-
-div#calendar-event-list
-{
-	display:none;
-	position:relative;
-	background:black;
-	padding:5px;
-	color:white;
-	height:100vh;
-	width:100vw;
-	
 }
+
 
 
 /*///////////////////////////
@@ -321,7 +310,7 @@ div#location div#weather section
 {
 	border-top:2px dashed white;
 	margin: 0 0 0px 0;
-	padding:12px 5px 12px 5px;
+	padding:12px 5px 12px 0px;
 	background:black;
 
 }
@@ -358,17 +347,6 @@ div#location div#weather div#wind-speed div#wind-speed-unit
 {
 	max-height:0.7rem;
 }
-
-.day-style-1
-{
-	//background:rgba(0,0,255,0.6);
-}
-
-.day-style-2
-{
-	//background:rgba(11,135,61,0.6);
-}
-
 
 
 
