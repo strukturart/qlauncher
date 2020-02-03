@@ -1,0 +1,25 @@
+{
+  "name": "kaios-custom-launcher",
+  "version": "1.0.0",
+  "description": "a custom launcher for kaiOS",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "parcel build src/index.html",
+    "watch": "parcel src/index.html",
+    "package": "npm run build && ./package_app.sh"
+  },
+  "author": "strukturart",
+  "license": "MIT",
+  "devDependencies": {
+    "parcel": "^1.12.4",
+    "adm-zip": "^0.4.13",
+    "fs-extra": "^8.1.0",
+    "node-sass": "^4.13.0",
+    "parcel-plugin-bundle-visualiser": "^1.2.0",
+    "parcel-plugin-copy": "^1.0.2"
+  },
+  "staticPath": {
+    "source": "/static",
+    "target": "/dist"
+  }
+}
