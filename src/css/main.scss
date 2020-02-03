@@ -1,0 +1,79 @@
+/*GENERAL*/
+
+:root {
+  --color-one: black;
+  --color-two: yellow;
+  --color-three: silver;
+  --color-four: rgb(99, 99, 99);
+  --color-five: rgb(38, 38, 38);
+  --color-six: rgb(78, 206, 144);
+  --color-seven: gainsboro;
+}
+*,
+*:before,
+*:after {
+  border: 0px;
+  padding: 0px;
+  margin: 0px;
+  box-sizing: border-box;
+}
+
+*::-webkit-scrollbar {
+  width: 0 !important;
+  background-color: transparent !important;
+  display: none !important;
+}
+
+html,
+body {
+  font-weight: 100;
+  width: 100%;
+  position: relative;
+  margin: 0px;
+  padding: 0px;
+  font-size: 1rem;
+  line-height: 1.4rem;
+  -webkit-appearance: none;
+  height: 100%;
+  margin: 0;
+}
+
+h1 {
+  margin: 0 0 20px 0;
+  font-size: 1.2rem;
+}
+
+h2 {
+  font-size: 1rem;
+}
+
+.debug {
+  border: 1px solid red;
+}
+
+/*///////////////////////////
+///HELPER////////////////*/
+
+div#window-status {
+  position: fixed;
+  top: 10px;
+  left: 5px;
+  background: black;
+  color: white;
+  z-index: 900;
+  display: none;
+}
+
+@import "./applauncher.scss";
+@import "./quick-settings.scss";
+@import "./weather.scss";
+
+/* KaiOS portrait devices (240x320) */
+@media only screen and (orientation: portrait) {
+  /* styles */
+}
+
+/* KaiOS landscape devices (320x240) */
+@media screen and (orientation: landscape) {
+  /* styles */
+}

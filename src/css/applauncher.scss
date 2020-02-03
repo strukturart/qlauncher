@@ -1,0 +1,58 @@
+/*///////////////////////////
+///FINDER////////////////*/
+
+div#finder {
+  position: relative;
+  background: black;
+  padding: 5px;
+  color: white;
+  height: 100vh;
+  width: 100vw;
+}
+
+div#finder-error {
+  position: absolute;
+  z-index: 2;
+  top: 50%;
+  left: 50%;
+  margin: -7px 0 0 -50px;
+  width: 92px;
+  background: black;
+  color: white;
+  font-size: 14px;
+  padding: 3px;
+  display: none;
+}
+
+div#finder div#app-list {
+  background: black;
+  color: white;
+  margin: 0 0 3px 0;
+  padding: 3px;
+  max-height: 90%;
+  min-width: 95%;
+  overflow: hidden;
+}
+
+div#finder div#app-list .child-of-dir {
+  display: none;
+}
+
+div#finder div#app-list .dir {
+  border-left: 4px solid silver;
+  padding: 0 0 0 3px;
+}
+
+div#finder div#app-list .dir span.app-name {
+  display: none;
+}
+
+div#finder div#app-list div {
+  min-width: 100%;
+  margin: 0 0 5px 0;
+}
+
+div#finder div:focus {
+  background: yellow;
+  color: black;
+}
