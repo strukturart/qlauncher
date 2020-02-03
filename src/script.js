@@ -1,7 +1,7 @@
 import moment from 'moment'
 import Chart from 'chart.js'
 import $ from 'jquery'
-import Applait from '../thirdparty/applait.finder.min.js'
+import { Finder } from '../thirdparty/applait.finder.min.js'
 
 $(document).ready(function() {
   //Global Vars
@@ -217,7 +217,7 @@ $(document).ready(function() {
   function finder() {
     app_list_filter_arr.length = 0;
 
-    var finder = new Applait.Finder({ type: "sdcard", debugMode: true });
+    var finder = new Finder({ type: "sdcard", debugMode: true });
 
     finder.on("empty", function(needle) {
       //alert("no sdcard found, no openweathermap api-key found");
