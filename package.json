@@ -6,20 +6,24 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "parcel build src/index.html",
     "watch": "parcel src/index.html",
-    "package": "npm run build && ./package_app.sh"
+    "package": "npm run build && ./package_app.sh",
+    "test-format": "prettier --check \"src/**/*.{js,html,css,scss}\"",
+    "format": "prettier --write \"src/**/*.{js,html,css,scss}\""
   },
   "author": "strukturart",
   "license": "MIT",
   "devDependencies": {
-    "parcel": "^1.12.4",
     "adm-zip": "^0.4.13",
     "fs-extra": "^8.1.0",
     "node-sass": "^4.13.0",
+    "parcel": "^1.12.4",
     "parcel-plugin-bundle-visualiser": "^1.2.0",
-    "parcel-plugin-copy": "^1.0.2"
+    "parcel-plugin-copy": "^1.0.2",
+    "prettier": "^1.19.1"
   },
   "staticPath": {
     "source": "/static",
     "target": "/dist"
-  }
+  },
+  "dependencies": {}
 }
