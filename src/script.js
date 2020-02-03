@@ -1,3 +1,8 @@
+import moment from 'moment'
+import Chart from 'chart.js'
+import $ from 'jquery'
+import Applait from '../thirdparty/applait.finder.min.js'
+
 $(document).ready(function() {
   //Global Vars
   var windowOpen = false;
