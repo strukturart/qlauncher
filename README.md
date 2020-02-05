@@ -18,7 +18,7 @@ custom-launcher
 ## Installation
 
 
-1. download [/build/custom-launcher.zip](/build/custom-launcher.zip) 
+1. download [custom-launcher.zip](#) from the releases Page 
 2. copy in sdcard/downloads/ on your phone 
 3. installl the app with the GerdaOs Installer App.
 4. Put on your sd card a file with the name custom-launcher.json with the following structure:
@@ -100,3 +100,10 @@ You like the app and you have enough money
 [![](https://www.paypalobjects.com/en_US/i/btn/btn_donateCC_LG.gif)](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=Q8QLA8CNMWAWG)
 
 
+### Development
+
+Install dependencies: `npm i` (you need to have nodejs installed, we recommend using nvm (Node Version Manager))
+
+- Build application, installable with webide: `npm run build`
+- Test application in system browser (experimental): `npm run watch`
+- Package application for releasing or installation with OmniSD

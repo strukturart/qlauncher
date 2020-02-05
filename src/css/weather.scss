@@ -1,0 +1,127 @@
+div#location {
+  div#weather {
+    margin: 10px 0 0 0;
+  }
+}
+
+div#location div#temp {
+  font-size: 1.7rem;
+}
+
+div#location div#weather section {
+  border-top: 2px dashed white;
+  margin: 0 0 0px 0;
+  padding: 12px 5px 12px 0px;
+  background: black;
+}
+
+div#location div#weather div#weather-bar div#icon {
+  margin: 8px 0 0 0;
+}
+
+div#location div#weather div#wind-dir {
+  font-size: 1.7rem;
+  max-height: 1.7rem !important;
+}
+
+div#location div#weather div#wind-speed {
+  font-size: 0.7rem;
+  max-height: 1.7rem !important;
+  margin: -10px 0 0 0;
+}
+
+div#location div#weather div#wind-speed div#wind-speed-val {
+  max-height: 0.7rem;
+}
+
+div#location div#weather div#wind-speed div#wind-speed-unit {
+  max-height: 0.7rem;
+}
+
+div#location {
+  position: absolute;
+  z-index: 1000;
+  left: 0;
+  top: 0;
+  background: black;
+  color: white;
+  font-size: 14px;
+  padding: 5px 10px 50px 5px;
+  overflow: hidden;
+  display: none;
+}
+
+div#weather-wrapper div#locations {
+  display: none;
+  position: fixed;
+  z-index: 1001;
+  background: black;
+  top: 0px;
+  left: 0px;
+}
+
+div#weather-wrapper div#locations:first-child {
+  outline: 2px solid red;
+}
+
+div#weather-wrapper div#locations div {
+  display: block;
+  background: black;
+  color: white;
+  width: 100%;
+  height: auto;
+  margin: 0 0 5px 0;
+}
+
+div#weather-wrapper div#locations div:focus {
+  background: yellow;
+  color: black;
+}
+
+div#weather-wrapper div#message {
+  position: absolute;
+  z-index: 5;
+  color: white;
+  top: 40%;
+  text-align: center;
+}
+
+div#weather-wrapper {
+  display: none;
+  background: black;
+}
+
+div#chart {
+  position: relative;
+  margin: 25px 0 10px 0;
+  height: 240px;
+  width: 99vw;
+  max-width: 99vw;
+  #myChart {
+    margin: 0 0 0 -5px !important;
+  }
+  div.legend {
+    span {
+      margin: 5px 5px 0 0;
+    }
+    span:first-child {
+      color: red;
+    }
+    span:nth-child(2) {
+      color: blue;
+    }
+  }
+}
+
+div#message-box {
+  display: none;
+  position: fixed;
+  bottom: 5px;
+  left: 0px;
+  padding: 5px;
+  min-width: 100vw;
+  height: auto;
+  background: pink;
+  color: black;
+  z-index: 2000;
+}
