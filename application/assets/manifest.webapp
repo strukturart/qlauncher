@@ -1,0 +1,82 @@
+{
+	"version": "1.0.0",
+	"name": "custom-launcher",
+	"description": "A launcher for your favorit apps",
+	"launch_path": "/index.html",
+	"type": "certified",
+
+
+	"icons": {
+		"56": "/icons/icon-56-56.png",
+		"112": "/icons/icon-112-112.png"
+	},
+	
+	"developer": 
+	{
+		"name": "strukturart",
+		"url": "https://github.com/strukturart/custom-launcher"
+	},
+
+
+	"messages": [
+	{ "alarm": "/index.html" },
+	{ "notification": "/index.html" }
+	],
+
+
+	"permissions": 
+	{
+
+		"desktop-notification":{},
+		"alarms": {
+      	"description": "Required to schedule alarms"
+    	},
+
+		"geolocation": {
+		"description": "Required to show user's location"
+		},
+
+		"device-storage:sdcard": {
+		"description": "Read from sd-card",
+		"access": "readonly"
+		},
+
+		"open-remote-window":{}, 
+
+		"device-storage:apps":{ "access": "readonly" },
+		"webapps-manage":{ },
+
+
+		"settings":
+		{
+			"access":"readwrite"
+		},
+
+		"wifi-manage":{},
+		"bluetooth":{},
+
+		"wake-lock":{},
+
+		"browser:embedded-system-app":{},
+
+		"telephony": {
+		"description": "Required to control telephony functions"
+		},
+
+
+
+		"spatialnavigation-app-manage": {
+		"navigator.spatialNavigationEnabled": false
+		},
+
+		"systemXHR": {
+		"description": "Required to load remote content"
+		}
+
+
+ 
+	}
+
+
+ 
+}

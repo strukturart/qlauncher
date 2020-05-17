@@ -1,0 +1,376 @@
+/*GENERAL*/
+
+:root {
+    --color-one: black;
+    --color-two: yellow;
+    --color-three: silver;
+    --color-four: rgb(99, 99, 99);
+    --color-five: rgb(38, 38, 38);
+    --color-six: rgb(78, 206, 144);
+    --color-seven: gainsboro;
+}
+
+*,
+*:before,
+*:after {
+    border: 0px;
+    padding: 0px;
+    margin: 0px;
+    box-sizing: border-box;
+}
+
+*::-webkit-scrollbar {
+    width: 0!important;
+    background-color: transparent!Important;
+    display: none!Important;
+    background: black;
+}
+
+*::-moz-focus-inner {
+    border: 0;
+}
+
+*:focus {
+    border: 0;
+}
+
+
+/* 1 */
+
+::-webkit-scrollbar-button {
+    display: none!Important;
+}
+
+
+/* 2 */
+
+::-webkit-scrollbar-track {
+    display: none!Important;
+    background: black;
+}
+
+
+/* 3 */
+
+::-webkit-scrollbar-track-piece {
+    display: none!Important;
+    background: black;
+}
+
+
+/* 4 */
+
+::-webkit-scrollbar-thumb {
+    display: none!Important;
+    background: black;
+}
+
+
+/* 5 */
+
+::-webkit-scrollbar-corner {
+    display: none!Important;
+    background: black;
+}
+
+html,
+body {
+    font-weight: 100;
+    width: 100vw;
+    position: relative;
+    margin: 0px;
+    padding: 0px;
+    font-size: 1.0rem;
+    line-height: 1.4rem;
+    -webkit-appearance: none;
+    height: 100%;
+    margin: 0;
+}
+
+h1 {
+    margin: 0 0 20px 0;
+    font-size: 1.2rem;
+}
+
+h2 {
+    font-size: 1.0rem;
+}
+
+.debug {
+    border: 1px solid red;
+}
+
+
+/*///////////////////////////
+///HELPER////////////////*/
+
+div#bottom-bar {
+    position: fixed;
+    bottom: 10px;
+    left: 0px;
+    height: 15px;
+    z-index: 5;
+    background: gray;
+}
+
+div#bottom-bar div#inner {
+    position: relative;
+}
+
+div#bottom-bar div {
+    background: gray;
+    color: white;
+    padding: 2px;
+}
+
+div#bottom-bar div#button-center {
+    background: gray;
+    color: white;
+    padding: 2px;
+    width: 30%;
+    text-align: center;
+}
+
+div#bottom-bar div#button-left {
+    background: gray;
+    color: white;
+    padding: 2px;
+    width: 20px;
+    text-align: left;
+    width: 30%;
+}
+
+div#bottom-bar div#button-right {
+    background: gray;
+    color: white;
+    padding: 2px;
+    width: 30%;
+    text-align: right;
+}
+
+div#toast {
+    position: fixed;
+    height: auto;
+    overflow: none;
+    top: -100px;
+    background: black;
+    color: white;
+    z-index: 5000;
+    min-width: 100%;
+    padding: 5px;
+    text-align: center;
+}
+
+
+/*///////////////////////////
+///FINDER////////////////*/
+
+div#finder {
+    position: relative;
+    background: black;
+    padding: 5px;
+    color: white;
+}
+
+div#finder div#app-list {
+    background: black;
+    color: white;
+    margin: 0 0 3px 0;
+    padding: 3px;
+    overflow: hidden;
+}
+
+div#finder div#app-list .child-of-dir {
+    display: none;
+}
+
+div#finder div#app-list .dir {
+    border-left: 4px solid silver;
+    padding: 0 0 0 3px;
+}
+
+div#finder div#app-list .dir span.app-name {
+    display: none;
+}
+
+div#finder div#app-list div {
+    min-width: 100%;
+    margin: 0 0 5px 0;
+}
+
+div#finder div:focus {
+    background: yellow;
+    color: black;
+    border: 0;
+}
+
+div#weather-wrapper {
+    display: none;
+    background: black;
+}
+
+div#quick-settings {
+    display: none;
+    position: relative;
+    background: black;
+    padding: 5px;
+    color: white;
+}
+
+div#quick-settings div:focus {
+    background: yellow;
+    color: black;
+}
+
+div#quick-settings div.alarms {
+    margin: 15px 0 0 0;
+}
+
+div#quick-settings div.alarms div {
+    padding: 0 10px 0 0;
+}
+
+div#quick-settings div.alarms div:first:after {
+    content: "-";
+}
+
+
+/*///////////////////////////
+///LOCATION////////////////*/
+
+div#chart {
+    position: relative;
+    margin: 25px 0 10px 0;
+    height: 240px;
+    width: 95vw;
+    max-width: 95vw;
+}
+
+div#chart #myChart {
+    margin: 0 0 0 -5px!Important;
+}
+
+div#chart div.legend span {
+    margin: 5px 5px 0 0;
+}
+
+div#chart div.legend span:first-child {
+    color: red;
+}
+
+div#chart div.legend span:nth-child(2) {
+    color: blue;
+}
+
+div#location {
+    position: absolute;
+    z-index: 2;
+    left: 0;
+    top: 0;
+    background: black;
+    color: white;
+    font-size: 14px;
+    padding: 5px 10px 50px 5px;
+    overflow: hidden;
+    display: none;
+}
+
+div#weather-wrapper div#locations {
+    display: none;
+    position: fixed;
+    z-index: 3;
+    background: black;
+    top: 0px;
+    left: 0px;
+}
+
+div#weather-wrapper div#locations:first-child {
+    outline: 2px solid red;
+}
+
+div#weather-wrapper div#locations div {
+    display: block;
+    background: black;
+    color: white;
+    width: 100%;
+    height: auto;
+    margin: 0 0 5px 0;
+}
+
+div#weather-wrapper div#locations div:focus {
+    background: yellow;
+    color: black;
+}
+
+div#weather-wrapper div#message {
+    position: absolute;
+    z-index: 5;
+    color: white;
+    top: 40%;
+    text-align: center;
+}
+
+div#location div#weather {
+    margin: 10px 0 0 0;
+}
+
+div#location div#temp {
+    font-size: 1.7rem;
+}
+
+div#location div#weather section {
+    border-top: 2px dashed white;
+    margin: 0 0 0px 0;
+    padding: 12px 5px 12px 0px;
+    background: black;
+}
+
+div#location div#weather div#weather-bar div#icon {
+    margin: 8px 0 0 0;
+}
+
+div#location div#weather div#wind-dir {
+    font-size: 1.7rem;
+    max-height: 1.7rem!Important;
+}
+
+div#location div#weather div#wind-speed {
+    font-size: 0.7rem;
+    max-height: 1.7rem!Important;
+    margin: -10px 0 0 0;
+}
+
+div#location div#weather div#wind-speed div#wind-speed-val {
+    max-height: 0.7rem;
+}
+
+div#location div#weather div#wind-speed div#wind-speed-unit {
+    max-height: 0.7rem;
+}
+
+div#message-box {
+    display: none;
+    position: fixed;
+    bottom: 5px;
+    left: 0px;
+    padding: 5px;
+    min-width: 100vw;
+    height: auto;
+    background: pink;
+    color: black;
+    z-index: 2;
+}
+
+
+/* KaiOS portrait devices (240x320) */
+
+@media only screen and (orientation: portrait) {
+    /* styles */
+}
+
+
+/* KaiOS landscape devices (320x240) */
+
+@media screen and (orientation: landscape) {
+    /* styles */
+}

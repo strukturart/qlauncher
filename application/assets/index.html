@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+    <title>Custom-Launcher</title>
+    <meta http-equiv="Content-Security-Policy" content="default-src  https://api.openweathermap.org/* 'self'">
+
+
+
+
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="shortcut icon" type="image/x-icon" href="docs/images/favicon.ico" />
+    <link rel="stylesheet" href="assets/css/main.css" />
+    <link rel="stylesheet" href="assets/css/grid.css" />
+
+
+    <script defer src="assets/js/jQuery-3.1.0.js"></script>
+    <script defer src="assets/js/moments.min.js"></script>
+    <script defer src="assets/js/helper.js"></script>
+
+    <script defer src="assets/js/applait.finder.min.js"></script>
+    <script defer src="assets/js/script.js"></script>
+
+    <script defer src="assets/js/Chart.bundle.js"></script>
+
+
+</head>
+
+<body>
+    <div id="wrapper" class="width-100">
+
+        <div id="toast" class="width-100"></div>
+
+        <div id="message-box"></div>
+
+        <!---------------->
+        <!--app launcher-->
+        <!---------------->
+        <div id="finder" class="flex width-100 height-100 page">
+            <div id="app-list"></div>
+        </div>
+
+        <!----------------------->
+        <!--quick settings------->
+        <!----------------------->
+
+        <div id="quick-settings" class="flex width-100 height-100 page">
+
+            <div class="items wifi" tabindex="0" data-function="wifi">wifi</div>
+            <div class="items bluetooth" tabindex="1" data-function="bluetooth">bluetooth</div>
+            <div class="items mobile-data" tabindex="2" data-function="mobile_data">mobile data</div>
+            <div class="items tethering" tabindex="3" data-function="tethering">tethering</div>
+            <div class="items airplane" tabindex="4" data-function="airplane">airplane</div>
+            <div class="alarms items">
+                <h2>Sleep Mode</h2>
+                <div class="time flex" tabindex="5" data-function="sleep"></div>
+            </div>
+
+        </div>
+
+
+
+        <!---------------->
+        <!--weather------->
+        <!---------------->
+
+        <div id="weather-wrapper" class="flex width-100 height-100 page">
+
+            <div id="message" class="width-100">
+                Please wait...
+            </div>
+
+
+            <div id="bottom-bar">
+                <div class="inner flex justify-content-spacebetween width-100">
+                    <div id="button-left"></div>
+                    <div id="button-center"></div>
+                    <div id="button-right"></div>
+                </div>
+            </div>
+
+            <div id="locations" class="flex width-100 height-100"></div>
+
+            <div id="location" class="flex justify-content-center align-item-center width-100">
+                <div id="chart" class="width-100">
+                    <h1 id="location_name"></h1>
+                    <canvas id="myChart"></canvas>
+                    <div class="legend flex"><span>temp</span><span>rain</span></div>
+                </div>
+                <div>
+
+                    <div id="weather">
+
+                        <section id="forecast-0">
+
+                            <div class="width-100 title flex justify-content-spacebetween">
+
+                                <div class="forecast-time width-100"></div>
+
+                                <div id="weather-bar" class="flex grid-col-11 align-item-center justify-content-spacearound">
+                                    <div id="icon"><img src=""></div>
+                                    <div id="temp"></div>
+                                </div>
+
+                                <div id="weather-bar" class="flex flex grid-col-11 align-item-center justify-content-spacearound">
+
+                                    <div id="wind" class="flex align-item-center">
+                                        <div id="wind-dir"></div>
+                                        <div id="wind-speed">
+                                            <div id="wind-speed-val"></div>
+                                            <div id="wind-speed-unit">m/sec</div>
+                                        </div>
+                                    </div>
+
+                                    <div id="pressure">
+                                        <div id="pressure-val"></div>
+                                        <div id="pressure-unit">hpa</div>
+                                    </div>
+                                </div>
+
+                            </div>
+
+                        </section>
+
+                    </div>
+
+
+                </div>
+
+
+
+
+            </div>
+
+</body>
+
+</html>
