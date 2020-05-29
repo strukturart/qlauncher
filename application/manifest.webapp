@@ -1,6 +1,6 @@
 {
 	"version": "1.0.0",
-	"name": "custom-launcher",
+	"name": "qlauncher",
 	"description": "A launcher for your favorit apps",
 	"launch_path": "/index.html",
 	"type": "certified",
@@ -17,8 +17,10 @@
 		"url": "https://github.com/strukturart/custom-launcher"
 	},
 
+
 	"messages": [
-	{ "alarm": "/index.html" }
+	{ "alarm": "/index.html" },
+	{ "notification": "/index.html" }
 	],
 
 
@@ -52,6 +54,14 @@
 
 		"wifi-manage":{},
 		"bluetooth":{},
+
+		"telephony": {
+		"description": "Required to control telephony functions"
+		},
+
+		"wake-lock":{},
+
+		"browser:embedded-system-app":{},
 
 
 		"spatialnavigation-app-manage": {
